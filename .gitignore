@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+.cursor/
+.zed/
+*.swp
+*.swo
+
+# Env files (each sub-project has its own .env.example as source of truth)
+.env
+.env.*
+!.env.example
