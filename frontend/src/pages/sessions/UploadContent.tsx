@@ -9,8 +9,6 @@ export default function UploadContent() {
   const sessionId = Number(id)
   const navigate = useNavigate()
 
-  const [contentFile, setContentFile] = useState<File | null>(null)
-  const [knowledgeFile, setKnowledgeFile] = useState<File | null>(null)
   const [contentUpload, setContentUpload] = useState<Upload | null>(null)
   const [knowledgeUpload, setKnowledgeUpload] = useState<Upload | null>(null)
   const [error, setError] = useState('')
@@ -35,8 +33,6 @@ export default function UploadContent() {
   })
 
   const handleFileSelect = (file: File, kind: 'content' | 'knowledge') => {
-    if (kind === 'content') setContentFile(file)
-    else setKnowledgeFile(file)
     uploadMutation.mutate({ file, kind })
   }
 

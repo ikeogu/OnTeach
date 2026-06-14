@@ -173,7 +173,7 @@ function ActiveView({
   phase: EmbedPhase
 }) {
   const store = usePlayerStore()
-  const { send } = usePlayerWebSocket(joinResult.wsUrl, joinResult.studentToken)
+  const send = usePlayerWebSocket(joinResult.ws_url, joinResult.student_token)
 
   useEffect(() => {
     if (store.phase === 'active' && phase === 'connecting') onPhaseChange('active')
@@ -220,9 +220,9 @@ function ActiveView({
     <div className="h-screen bg-[#0d1117] flex flex-col overflow-hidden">
       {/* Avatar / video area */}
       <div className="flex-1 flex items-center justify-center relative">
-        {store.currentMedia ? (
+        {store.mediaOverlay ? (
           <img
-            src={store.currentMedia.url}
+            src={store.mediaOverlay.url}
             alt="media"
             className="max-h-full max-w-full object-contain rounded-xl"
           />
@@ -258,10 +258,10 @@ function ActiveView({
       <div className="px-4 py-3 bg-[#0d1117]/90 border-t border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => send({ type: store.paused ? 'resume' : 'pause' })}
+            onClick={() => send({ type: store.isPaused ? 'resume' : 'pause' })}
             className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
           >
-            {store.paused ? (
+            {store.isPaused ? (
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
               </svg>

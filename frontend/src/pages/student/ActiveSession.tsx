@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState, FormEvent } from 'react'
+import { useEffect, useRef, useCallback, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { usePlayerStore, type QAMessage, type Bookmark } from '../../store/playerStore'
 import { usePlayerWebSocket, closePlayerWebSocket } from '../../hooks/usePlayerWebSocket'
@@ -204,13 +204,11 @@ function PauseModal({ onResume }: { onResume: () => void }) {
 
 function CompleteModal({
   studentName,
-  sessionName,
   creatorName,
   onClose,
   onReplay,
 }: {
   studentName: string
-  sessionName: string
   creatorName: string
   onClose: () => void
   onReplay: () => void
@@ -307,7 +305,7 @@ export default function ActiveSession() {
     initHeyGen(heygenAccessToken, heygenSessionId)
   }, [heygenAccessToken, heygenSessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function initHeyGen(accessToken: string, sessionId: string | null) {
+  async function initHeyGen(accessToken: string, _sessionId: string | null) {
     // Production: initialise @heygen/streaming-avatar SDK here.
     //
     //   import StreamingAvatar, { StreamingEvents } from '@heygen/streaming-avatar'
@@ -544,7 +542,6 @@ export default function ActiveSession() {
         {phase === 'complete' && (
           <CompleteModal
             studentName={studentName}
-            sessionName={sessionName}
             creatorName={creatorName}
             onClose={() => navigate(`/s/${shareSlug}`, { replace: true })}
             onReplay={handleReplay}
