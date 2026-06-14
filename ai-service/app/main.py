@@ -3,8 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import script, session_ws
-from .routers import rag
+from .routers import script, session_ws, rag, livekit_token
 
 
 @asynccontextmanager
@@ -31,6 +30,7 @@ app.add_middleware(
 app.include_router(script.router)
 app.include_router(session_ws.router)
 app.include_router(rag.router)
+app.include_router(livekit_token.router)
 
 
 @app.get("/healthz")
