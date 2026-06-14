@@ -1,13 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { usePlayerStore } from '../../store/playerStore'
 import { usePlayerWebSocket, closePlayerWebSocket } from '../../hooks/usePlayerWebSocket'
 
+const AGENT_TIMEOUT_MS = 45_000
+
 export default function SessionLoading() {
   const { shareSlug } = useParams<{ shareSlug: string }>()
   const navigate = useNavigate()
-  const { phase, studentName, sessionName, errorMessage } = usePlayerStore()
+  const { phase, studentName, sessionName, errorMessage, setPhase } = usePlayerStore()
   const didConnect = useRef(false)
+  const [timedOut, setTimedOut] = useState(false)
 
   // Opens the LiveKit room connection as soon as livekitUrl + livekitToken are in the store
   usePlayerWebSocket()
@@ -17,8 +20,18 @@ export default function SessionLoading() {
     if (phase === 'active' || phase === 'ready') {
       navigate(`/s/${shareSlug}/play`, { replace: true })
     }
-    // Don't auto-redirect on error — show the message so the user knows what happened
   }, [phase, shareSlug, navigate])
+
+  // Timeout: if agent never joins within 45 s, show a helpful error
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if (phase !== 'active' && phase !== 'error') {
+        setTimedOut(true)
+        setPhase('error', 'The session tutor took too long to join. Please try again.')
+      }
+    }, AGENT_TIMEOUT_MS)
+    return () => clearTimeout(id)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Guard: if no session data (e.g. direct URL hit), go back to join
   useEffect(() => {
@@ -53,14 +66,16 @@ export default function SessionLoading() {
             : 'Connecting…'}
         </p>
         {phase === 'error' && (
-          <div className="text-center space-y-3">
+          <div className="text-center space-y-3 mt-2">
             <p className="text-red-400 text-sm">{errorMessage ?? 'Connection failed.'}</p>
-            <p className="text-white/30 text-xs">Make sure the AI service is running, then try again.</p>
+            {timedOut && (
+              <p className="text-white/30 text-xs">The session agent may still be starting up — try again in a moment.</p>
+            )}
             <button
               onClick={() => { closePlayerWebSocket(); navigate(`/s/${shareSlug}`, { replace: true }) }}
               className="text-[#5b5bd6] text-sm font-medium hover:underline"
             >
-              ← Back to join
+              ← Try again
             </button>
           </div>
         )}
