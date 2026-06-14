@@ -12,7 +12,7 @@ export interface AuthResponse {
   user: User
   token: string
 }
-
+ 
 export const authApi = {
   register: (data: { name: string; email: string; password: string; password_confirmation: string }) =>
     api.post<AuthResponse>('/auth/register', data).then((r) => r.data),
