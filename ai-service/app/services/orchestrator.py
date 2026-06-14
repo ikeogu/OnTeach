@@ -124,6 +124,10 @@ class SessionOrchestrator:
         elif t == "webrtc_ready":
             self._webrtc_ready_ev.set()
 
+        elif t == "heygen_session_id":
+            if self._driver and hasattr(self._driver, "set_session_id"):
+                self._driver.set_session_id(msg.get("session_id", ""))
+
         elif t == "raise_hand":
             if not self._in_qa:
                 self._pending_action = {"type": "raise_hand"}

@@ -306,24 +306,34 @@ export default function ActiveSession() {
   }, [heygenAccessToken, heygenSessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function initHeyGen(accessToken: string, _sessionId: string | null) {
-    // Production: initialise @heygen/streaming-avatar SDK here.
-    //
-    //   import StreamingAvatar, { StreamingEvents } from '@heygen/streaming-avatar'
-    //   const avatar = new StreamingAvatar({ token: accessToken })
-    //   avatar.on(StreamingEvents.STREAM_READY, (e) => {
-    //     if (videoRef.current) videoRef.current.srcObject = e.detail
-    //   })
-    //   avatar.on(StreamingEvents.AVATAR_START_TALKING, () =>
-    //     send({ type: 'avatar_event', event: 'AVATAR_START_TALKING' }))
-    //   avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () =>
-    //     send({ type: 'avatar_event', event: 'AVATAR_STOP_TALKING' }))
-    //   await avatar.startAvatarSession({ sessionId })
-    //   send({ type: 'webrtc_ready' })
-    //
-    // Dev / mock path:
+    // Mock / dev path (no real HeyGen token)
     if (!accessToken || accessToken === 'mock-access-token') {
       send({ type: 'webrtc_ready' })
+      return
     }
+
+    // Production — HeyGen SDK v2 (token-based session)
+    //
+    // import StreamingAvatar, { StreamingEvents, AvatarQuality } from '@heygen/streaming-avatar'
+    //
+    // const avatar = new StreamingAvatar({ token: accessToken })
+    //
+    // avatar.on(StreamingEvents.STREAM_READY, (e) => {
+    //   if (videoRef.current) videoRef.current.srcObject = e.detail
+    // })
+    // avatar.on(StreamingEvents.AVATAR_START_TALKING, () =>
+    //   send({ type: 'avatar_event', event: 'AVATAR_START_TALKING' }))
+    // avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () =>
+    //   send({ type: 'avatar_event', event: 'AVATAR_STOP_TALKING' }))
+    //
+    // const session = await avatar.createStartAvatar({
+    //   quality: AvatarQuality.High,
+    //   avatarName: 'default',         // use session's avatar_id
+    // })
+    //
+    // // Tell the server the session_id so it can call speak/interrupt
+    // send({ type: 'heygen_session_id', session_id: session.session_id })
+    // send({ type: 'webrtc_ready' })
   }
 
   const progressPercent =

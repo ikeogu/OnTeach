@@ -1,4 +1,4 @@
-"""HeyGen Streaming Avatar driver."""
+"""HeyGen Streaming Avatar driver (SDK v2 — token-based session)."""
 from __future__ import annotations
 
 import asyncio
@@ -10,55 +10,56 @@ from .avatar_driver import AvatarSession
 
 _BASE = "https://api.heygen.com"
 
-_BACKGROUND_MAP = {
-    "neutral_studio": "Transparent",
-    "modern_office": "office",
-    "classroom": "classroom",
-    "solid_blue": "solid_color_blue",
-}
-
 
 class HeyGenDriver:
-    """Controls a HeyGen LiveAvatar session via REST API."""
+    """Controls a HeyGen Interactive Avatar session.
+
+    Flow (SDK v2):
+      1. Server calls /v1/streaming.create_token  → short-lived token
+      2. Token is forwarded to browser via session_connecting
+      3. Browser SDK creates the WebRTC session, gets a session_id
+      4. Browser sends { type: "heygen_session_id", session_id: "..." } via WS
+      5. Orchestrator calls set_session_id(); speak/interrupt then work normally
+    """
 
     def __init__(self, api_key: str | None = None):
         self._api_key = api_key or settings.heygen_api_key
         self._session_id: str | None = None
+        self._session_id_ev = asyncio.Event()
 
     def _headers(self) -> dict:
         return {"x-api-key": self._api_key, "Content-Type": "application/json"}
 
+    def set_session_id(self, session_id: str) -> None:
+        """Called by orchestrator when browser SDK reports its session_id."""
+        self._session_id = session_id
+        self._session_id_ev.set()
+
     async def start_session(
         self, avatar_id: str, voice_id: str, background: str
     ) -> AvatarSession:
-        payload = {
-            "quality": "high",
-            "avatar_name": avatar_id,
-            "voice": {"voice_id": voice_id},
-            "background": {"type": "color", "value": "#1a1a2e"}
-            if background == "solid_blue"
-            else {"type": "preset", "value": _BACKGROUND_MAP.get(background, "Transparent")},
-        }
+        """Mint a short-lived token; the browser SDK creates the actual session."""
         async with httpx.AsyncClient(timeout=20) as http:
             resp = await http.post(
-                f"{_BASE}/v1/streaming.new",
+                f"{_BASE}/v1/streaming.create_token",
                 headers=self._headers(),
-                json=payload,
             )
             resp.raise_for_status()
-            data = resp.json()["data"]
+            token = resp.json()["data"]["token"]
 
-        self._session_id = data["session_id"]
         return AvatarSession(
-            provider_session_id=data["session_id"],
-            access_token=data["access_token"],
-            url=data.get("url", ""),
+            provider_session_id="",   # filled in via set_session_id() later
+            access_token=token,
+            url="",
         )
 
     async def speak(self, text: str, stop_event: asyncio.Event | None = None) -> None:
-        """Fire-and-forget: POST text to HeyGen. Browser signals stop via WS."""
-        if not self._session_id:
+        """Wait until browser has sent us the session_id, then POST the task."""
+        try:
+            await asyncio.wait_for(self._session_id_ev.wait(), timeout=30.0)
+        except asyncio.TimeoutError:
             return
+
         async with httpx.AsyncClient(timeout=10) as http:
             await http.post(
                 f"{_BASE}/v1/streaming.task",
@@ -69,8 +70,6 @@ class HeyGenDriver:
                     "task_type": "repeat",
                 },
             )
-        # stop_event is set by the orchestrator dispatcher when the browser
-        # sends { type: "avatar_event", event: "AVATAR_STOP_TALKING" }
 
     async def interrupt(self) -> None:
         if not self._session_id:
@@ -96,3 +95,4 @@ class HeyGenDriver:
             pass
         finally:
             self._session_id = None
+            self._session_id_ev.clear()
