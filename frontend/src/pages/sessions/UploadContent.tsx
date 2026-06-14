@@ -83,7 +83,6 @@ export default function UploadContent() {
               <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">REQUIRED</span>
             </div>
             <DropZone
-              file={contentFile}
               upload={contentUpload}
               isUploading={uploadMutation.isPending && !contentUpload}
               accept=".pdf,.pptx,.ppt,.docx,.doc,.txt"
@@ -103,7 +102,6 @@ export default function UploadContent() {
               <span className="text-xs bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full font-medium">OPTIONAL</span>
             </div>
             <DropZone
-              file={knowledgeFile}
               upload={knowledgeUpload}
               isUploading={uploadMutation.isPending && !!contentUpload && !knowledgeUpload}
               accept=".pdf,.txt"
@@ -143,7 +141,6 @@ export default function UploadContent() {
 }
 
 interface DropZoneProps {
-  file: File | null
   upload: Upload | null
   isUploading: boolean
   accept: string
@@ -155,7 +152,7 @@ interface DropZoneProps {
   onClick: () => void
 }
 
-function DropZone({ file, upload, isUploading, accept, hint, icon, inputRef, onFileSelect, onDrop, onClick }: DropZoneProps) {
+function DropZone({ upload, isUploading, accept, hint, icon, inputRef, onFileSelect, onDrop, onClick }: DropZoneProps) {
   const [isDragOver, setIsDragOver] = useState(false)
 
   if (upload) {

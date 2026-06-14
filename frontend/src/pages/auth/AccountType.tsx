@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { authApi } from '../../api/auth'
 import { useAuthStore } from '../../store/authStore'
 
 export default function AccountType() {
   const navigate = useNavigate()
-  const { user, updateUser } = useAuthStore()
+  const { updateUser } = useAuthStore()
   const [selected, setSelected] = useState<'individual' | 'team'>('individual')
 
   const mutation = useMutation({

@@ -24,7 +24,7 @@ const BLOCK_ICONS: Record<string, React.ReactNode> = {
 }
 
 export default function BlockCard({ block, index, isSelected }: Props) {
-  const { selectBlock, updateBlock, deleteBlock, addBlock } = useEditorStore()
+  const { selectBlock, deleteBlock, addBlock } = useEditorStore()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.clientId })
 
   const style = {
