@@ -32,8 +32,9 @@ interface PlayerState {
 
   // After join (from Laravel)
   sessionInstanceId: string | null
-  wsUrl: string | null
-  studentToken: string | null
+  livekitUrl: string | null
+  livekitToken: string | null
+  roomName: string | null
 
   // Phase
   phase: PlayerPhase
@@ -49,9 +50,6 @@ interface PlayerState {
 
   // Avatar state
   avatarSpeaking: boolean
-  heygenAccessToken: string | null
-  heygenSessionId: string | null
-  heygenUrl: string | null
 
   // Q&A
   qaOpen: boolean
@@ -72,7 +70,7 @@ interface PlayerState {
   setShareSlug: (slug: string) => void
   setPublicSession: (name: string, creatorName: string, coverImageUrl: string | null) => void
   setStudentName: (name: string) => void
-  setJoinResult: (r: { sessionInstanceId: string; wsUrl: string; studentToken: string }) => void
+  setJoinResult: (r: { sessionInstanceId: string; livekitUrl: string; livekitToken: string; roomName: string }) => void
   setPhase: (phase: PlayerPhase, error?: string) => void
   handleServerMessage: (msg: Record<string, unknown>) => void
   submitQuestion: (text: string) => void
@@ -95,8 +93,9 @@ const initial = {
   coverImageUrl: null,
   studentName: '',
   sessionInstanceId: null,
-  wsUrl: null,
-  studentToken: null,
+  livekitUrl: null,
+  livekitToken: null,
+  roomName: null,
   phase: 'idle' as PlayerPhase,
   errorMessage: null,
   currentBlockId: null,
@@ -106,9 +105,6 @@ const initial = {
   chapterIndex: 0,
   totalChapters: 0,
   avatarSpeaking: false,
-  heygenAccessToken: null,
-  heygenSessionId: null,
-  heygenUrl: null,
   qaOpen: false,
   qaMessages: [] as QAMessage[],
   qaStreaming: false,
@@ -130,24 +126,18 @@ export const usePlayerStore = create<PlayerState>()((set, get) => ({
 
   setStudentName: (name) => set({ studentName: name }),
 
-  setJoinResult: ({ sessionInstanceId, wsUrl, studentToken }) =>
-    set({ sessionInstanceId, wsUrl, studentToken }),
+  setJoinResult: ({ sessionInstanceId, livekitUrl, livekitToken, roomName }) =>
+    set({ sessionInstanceId, livekitUrl, livekitToken, roomName }),
 
   setPhase: (phase, error) => set({ phase, errorMessage: error ?? null }),
 
   handleServerMessage: (msg) => {
     const t = msg.type as string
 
-    if (t === 'session_connecting') {
-      set({
-        phase: 'connecting',
-        heygenAccessToken: msg.heygen_access_token as string,
-        heygenSessionId: msg.heygen_session_id as string,
-        heygenUrl: (msg.heygen_url as string) || null,
-      })
-    } else if (t === 'session_ready') {
+    if (t === 'session_ready') {
       set({
         phase: 'active',
+        sessionName: (msg.session_name as string) || get().sessionName,
         bookmarks: (msg.bookmarks as Bookmark[]) || [],
         totalChapters: ((msg.bookmarks as Bookmark[]) || []).length,
       })

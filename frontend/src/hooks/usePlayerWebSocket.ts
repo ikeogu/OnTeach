@@ -1,76 +1,89 @@
-import { useCallback, useEffect } from 'react'
+/**
+ * LiveKit-based replacement for the old WebSocket hook.
+ *
+ * The agent publishes control messages (block_started, show_media, etc.)
+ * via LiveKit data channels. We subscribe here and forward them to the
+ * player store exactly as before, so the rest of the UI is unchanged.
+ *
+ * "closePlayerWebSocket" is kept for API compatibility but just disconnects
+ * the LiveKit room.
+ */
+import { useCallback, useEffect, useRef } from 'react'
+import { Room, RoomEvent } from 'livekit-client'
 import { usePlayerStore } from '../store/playerStore'
 
 type SendFn = (msg: Record<string, unknown>) => void
 
-// Module-level singleton — survives the SessionLoading → ActiveSession navigation.
-// A new WebSocket is only created when the old one is gone (null / CLOSED).
-let _ws: WebSocket | null = null
-let _hbInterval: ReturnType<typeof setInterval> | null = null
+// Module-level room singleton — survives navigation between loading → active.
+let _room: Room | null = null
 
 export function closePlayerWebSocket() {
-  if (_hbInterval) { clearInterval(_hbInterval); _hbInterval = null }
-  if (_ws) { _ws.close(1000); _ws = null }
+  if (_room) {
+    _room.disconnect()
+    _room = null
+  }
+}
+
+export function getPlayerRoom(): Room | null {
+  return _room
 }
 
 export function usePlayerWebSocket(
-  explicitWsUrl?: string,
+  explicitLkUrl?: string,
   explicitToken?: string,
 ): SendFn {
-  const { wsUrl: storeWsUrl, studentToken: storeToken, setPhase, handleServerMessage } =
-    usePlayerStore()
+  const {
+    livekitUrl: storeLkUrl,
+    livekitToken: storeToken,
+    setPhase,
+    handleServerMessage,
+  } = usePlayerStore()
 
-  const wsUrl = explicitWsUrl ?? storeWsUrl
-  const studentToken = explicitToken ?? storeToken
+  const lkUrl   = explicitLkUrl ?? storeLkUrl
+  const lkToken = explicitToken  ?? storeToken
+
+  const connectedRef = useRef(false)
 
   const send = useCallback((msg: Record<string, unknown>) => {
-    if (_ws?.readyState === WebSocket.OPEN) {
-      _ws.send(JSON.stringify(msg))
+    if (_room?.state === 'connected') {
+      const bytes = new TextEncoder().encode(JSON.stringify(msg))
+      _room.localParticipant.publishData(bytes, { reliable: true })
     }
   }, [])
 
   useEffect(() => {
-    if (!wsUrl || !studentToken) return
+    if (!lkUrl || !lkToken) return
+    if (connectedRef.current) return
 
-    // Reuse the existing connection if it's still alive
-    if (_ws && (_ws.readyState === WebSocket.OPEN || _ws.readyState === WebSocket.CONNECTING)) {
-      return
-    }
+    const room = new Room()
+    _room = room
+    connectedRef.current = true
 
-    const url = `${wsUrl}?token=${encodeURIComponent(studentToken)}`
-    const ws = new WebSocket(url)
-    _ws = ws
-
-    ws.onmessage = (evt) => {
+    room.on(RoomEvent.DataReceived, (payload: Uint8Array) => {
       try {
-        const msg = JSON.parse(evt.data) as Record<string, unknown>
+        const msg = JSON.parse(new TextDecoder().decode(payload)) as Record<string, unknown>
         handleServerMessage(msg)
       } catch {
-        // non-JSON frame — ignore
+        // ignore non-JSON
       }
-    }
+    })
 
-    ws.onerror = () => {
-      setPhase('error', 'Connection error. Please refresh and try again.')
-      _ws = null
-    }
+    room.on(RoomEvent.Disconnected, () => {
+      connectedRef.current = false
+      _room = null
+      setPhase('error', 'Connection closed unexpectedly.')
+    })
 
-    ws.onclose = (evt) => {
-      if (evt.code !== 1000) {
-        setPhase('error', 'Connection closed unexpectedly.')
-      }
-      _ws = null
-    }
+    room.connect(lkUrl, lkToken).catch((err: unknown) => {
+      connectedRef.current = false
+      _room = null
+      const msg = err instanceof Error ? err.message : 'unknown error'
+      setPhase('error', `Failed to connect: ${msg}`)
+    })
 
-    _hbInterval = setInterval(() => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'heartbeat' }))
-      }
-    }, 25_000)
-
-    // No cleanup closure — the socket intentionally outlives this component.
-    // Call closePlayerWebSocket() explicitly to tear it down.
-  }, [wsUrl, studentToken, setPhase, handleServerMessage])
+    // No cleanup — room intentionally outlives the component.
+    // Call closePlayerWebSocket() explicitly to disconnect.
+  }, [lkUrl, lkToken, setPhase, handleServerMessage])
 
   return send
 }

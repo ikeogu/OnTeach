@@ -48,4 +48,10 @@ return [
         'laravel_internal_url' => env('LARAVEL_INTERNAL_URL', 'http://127.0.0.1:8000'),
     ],
 
+    'livekit' => [
+        'url' => env('LIVEKIT_URL', 'wss://pro-interface-uy02yea1.livekit.cloud'),
+        'api_key' => env('LIVEKIT_API_KEY'),
+        'api_secret' => env('LIVEKIT_API_SECRET'),
+    ],
+
 ];

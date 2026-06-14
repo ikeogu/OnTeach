@@ -42,8 +42,9 @@ export default function EmbedPlayer() {
       const result = await studentApi.join(embedSession.share_slug, name.trim())
       store.setJoinResult({
         sessionInstanceId: result.session_instance_id,
-        wsUrl: result.ws_url,
-        studentToken: result.student_token,
+        livekitUrl: result.livekit_url,
+        livekitToken: result.livekit_token,
+        roomName: result.room_name,
       })
       setJoinResult(result)
       setPhase('connecting')
@@ -173,7 +174,7 @@ function ActiveView({
   phase: EmbedPhase
 }) {
   const store = usePlayerStore()
-  const send = usePlayerWebSocket(joinResult.ws_url, joinResult.student_token)
+  const send = usePlayerWebSocket(joinResult.livekit_url, joinResult.livekit_token)
 
   useEffect(() => {
     if (store.phase === 'active' && phase === 'connecting') onPhaseChange('active')

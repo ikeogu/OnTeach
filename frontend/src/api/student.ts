@@ -17,8 +17,9 @@ export interface EmbedSession {
 
 export interface JoinResult {
   session_instance_id: string
-  ws_url: string
-  student_token: string
+  livekit_url: string
+  livekit_token: string
+  room_name: string
 }
 
 export const studentApi = {

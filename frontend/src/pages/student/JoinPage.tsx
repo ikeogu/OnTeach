@@ -38,8 +38,9 @@ export default function JoinPage() {
       const result = await studentApi.join(shareSlug, name.trim())
       store.setJoinResult({
         sessionInstanceId: result.session_instance_id,
-        wsUrl: result.ws_url,
-        studentToken: result.student_token,
+        livekitUrl: result.livekit_url,
+        livekitToken: result.livekit_token,
+        roomName: result.room_name,
       })
       navigate(`/s/${shareSlug}/loading`)
     } catch {

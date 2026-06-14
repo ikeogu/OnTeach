@@ -14,6 +14,14 @@ class Settings(BaseSettings):
     s3_bucket: str = ""
     s3_access_key_id: str = ""
     s3_secret_access_key: str = ""
+    # Tavus avatar
+    tavus_api_key: str = ""
+    tavus_replica_id: str = ""
+    tavus_persona_id: str = ""
+    # LiveKit
+    livekit_url: str = ""
+    livekit_api_key: str = ""
+    livekit_api_secret: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

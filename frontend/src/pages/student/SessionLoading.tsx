@@ -9,16 +9,8 @@ export default function SessionLoading() {
   const { phase, studentName, sessionName, errorMessage } = usePlayerStore()
   const didConnect = useRef(false)
 
-  // Opens the WebSocket as soon as wsUrl + studentToken are in the store
-  const send = usePlayerWebSocket()
-
-  // When server sends session_connecting, reply with webrtc_ready so the
-  // orchestrator proceeds (real HeyGen would set up WebRTC first; mock mode skips it)
-  useEffect(() => {
-    if (phase === 'connecting') {
-      send({ type: 'webrtc_ready' })
-    }
-  }, [phase, send])
+  // Opens the LiveKit room connection as soon as livekitUrl + livekitToken are in the store
+  usePlayerWebSocket()
 
   // Navigate once the server signals ready
   useEffect(() => {

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback, useState, type FormEvent } from 'react'
-import StreamingAvatar, { StreamingEvents, AvatarQuality } from '@heygen/streaming-avatar'
+import { Track, RoomEvent, type RemoteTrack } from 'livekit-client'
 import { useNavigate, useParams } from 'react-router-dom'
 import { usePlayerStore, type QAMessage, type Bookmark } from '../../store/playerStore'
-import { usePlayerWebSocket, closePlayerWebSocket } from '../../hooks/usePlayerWebSocket'
+import { usePlayerWebSocket, closePlayerWebSocket, getPlayerRoom } from '../../hooks/usePlayerWebSocket'
 
 // ── Sub-components ───────────────────────────────────────────────────────────
 
@@ -270,8 +270,6 @@ export default function ActiveSession() {
     chapterIndex,
     totalChapters,
     avatarSpeaking,
-    heygenAccessToken,
-    heygenSessionId,
     qaOpen,
     qaMessages,
     qaStreaming,
@@ -285,13 +283,9 @@ export default function ActiveSession() {
 
   const send = usePlayerWebSocket()
   const videoRef = useRef<HTMLVideoElement>(null)
-  const avatarInitialized = useRef(false)
+  const [hasVideoTrack, setHasVideoTrack] = useState(false)
 
-  // Note: WS lifecycle is managed explicitly — closed in handleReplay and the phase
-  // error/idle effect below. No automatic cleanup here to avoid React StrictMode
-  // running the cleanup on the dev "simulate unmount" and closing the socket mid-send.
-
-  // Guard: redirect on phase change
+  // Guard: redirect on error/idle
   useEffect(() => {
     if (phase === 'error' || phase === 'idle') {
       closePlayerWebSocket()
@@ -299,45 +293,44 @@ export default function ActiveSession() {
     }
   }, [phase, shareSlug, navigate])
 
-  // Init HeyGen SDK when credentials arrive from session_connecting
+  // Subscribe to Tavus video/audio tracks published by the LiveKit agent
   useEffect(() => {
-    if (!heygenAccessToken || avatarInitialized.current) return
-    avatarInitialized.current = true
-    initHeyGen(heygenAccessToken, heygenSessionId)
-  }, [heygenAccessToken, heygenSessionId]) // eslint-disable-line react-hooks/exhaustive-deps
+    const room = getPlayerRoom()
+    if (!room) return
 
-  async function initHeyGen(accessToken: string, _sessionId: string | null) {
-    // Mock / dev path
-    if (!accessToken || accessToken === 'mock-access-token') {
-      send({ type: 'webrtc_ready' })
-      return
+    function attachTrack(track: RemoteTrack) {
+      if (track.kind === Track.Kind.Video && videoRef.current) {
+        track.attach(videoRef.current)
+        setHasVideoTrack(true)
+      } else if (track.kind === Track.Kind.Audio) {
+        track.attach()
+      }
     }
 
-    try {
-      const avatar = new StreamingAvatar({ token: accessToken })
-
-      avatar.on(StreamingEvents.STREAM_READY, (e: CustomEvent) => {
-        if (videoRef.current) videoRef.current.srcObject = e.detail
-      })
-
-      avatar.on(StreamingEvents.AVATAR_START_TALKING, () => {
-        send({ type: 'avatar_event', event: 'AVATAR_START_TALKING' })
-      })
-
-      avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () => {
-        send({ type: 'avatar_event', event: 'AVATAR_STOP_TALKING' })
-      })
-
-      const session = await avatar.createStartAvatar({ quality: AvatarQuality.High })
-
-      // Give the server the session_id so it can drive speak/interrupt
-      send({ type: 'heygen_session_id', session_id: (session as { session_id: string }).session_id })
-      send({ type: 'webrtc_ready' })
-    } catch (err) {
-      console.error('HeyGen init failed:', err)
-      send({ type: 'webrtc_ready' })
+    function onTrackSubscribed(track: RemoteTrack) {
+      attachTrack(track)
     }
-  }
+
+    function onTrackUnsubscribed(track: RemoteTrack) {
+      track.detach()
+      if (track.kind === Track.Kind.Video) setHasVideoTrack(false)
+    }
+
+    room.on(RoomEvent.TrackSubscribed, onTrackSubscribed)
+    room.on(RoomEvent.TrackUnsubscribed, onTrackUnsubscribed)
+
+    // Attach any already-subscribed tracks (e.g. page re-render)
+    for (const participant of room.remoteParticipants.values()) {
+      for (const pub of participant.trackPublications.values()) {
+        if (pub.track && pub.isSubscribed) attachTrack(pub.track as RemoteTrack)
+      }
+    }
+
+    return () => {
+      room.off(RoomEvent.TrackSubscribed, onTrackSubscribed)
+      room.off(RoomEvent.TrackUnsubscribed, onTrackUnsubscribed)
+    }
+  }, [phase])
 
   const progressPercent =
     totalBlocks > 0 ? Math.round(((currentBlockIndex + 1) / totalBlocks) * 100) : 0
@@ -432,16 +425,16 @@ export default function ActiveSession() {
 
       {/* ── Video + overlays ── */}
       <div className="flex-1 relative overflow-hidden bg-[#111827]">
-        {/* Avatar video (hidden in mock mode — no stream) */}
+        {/* Tavus avatar video — shown when the LiveKit agent has published a video track */}
         <video
           ref={videoRef}
           autoPlay
           playsInline
-          className="absolute inset-0 w-full h-full object-cover"
+          className={`absolute inset-0 w-full h-full object-cover ${hasVideoTrack ? '' : 'hidden'}`}
         />
 
-        {/* Mock avatar placeholder — visible when no HeyGen video stream exists */}
-        {(!heygenAccessToken || heygenAccessToken === 'mock-access-token') && (
+        {/* Placeholder — visible until the Tavus video track arrives */}
+        {!hasVideoTrack && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-[#0d1117] to-[#1a1a3e]">
             {/* Animated avatar ring */}
             <div className="relative">
