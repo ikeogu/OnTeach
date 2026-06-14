@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState, type FormEvent } from 'react'
+import StreamingAvatar, { StreamingEvents, AvatarQuality } from '@heygen/streaming-avatar'
 import { useNavigate, useParams } from 'react-router-dom'
 import { usePlayerStore, type QAMessage, type Bookmark } from '../../store/playerStore'
 import { usePlayerWebSocket, closePlayerWebSocket } from '../../hooks/usePlayerWebSocket'
@@ -306,34 +307,36 @@ export default function ActiveSession() {
   }, [heygenAccessToken, heygenSessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function initHeyGen(accessToken: string, _sessionId: string | null) {
-    // Mock / dev path (no real HeyGen token)
+    // Mock / dev path
     if (!accessToken || accessToken === 'mock-access-token') {
       send({ type: 'webrtc_ready' })
       return
     }
 
-    // Production — HeyGen SDK v2 (token-based session)
-    //
-    // import StreamingAvatar, { StreamingEvents, AvatarQuality } from '@heygen/streaming-avatar'
-    //
-    // const avatar = new StreamingAvatar({ token: accessToken })
-    //
-    // avatar.on(StreamingEvents.STREAM_READY, (e) => {
-    //   if (videoRef.current) videoRef.current.srcObject = e.detail
-    // })
-    // avatar.on(StreamingEvents.AVATAR_START_TALKING, () =>
-    //   send({ type: 'avatar_event', event: 'AVATAR_START_TALKING' }))
-    // avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () =>
-    //   send({ type: 'avatar_event', event: 'AVATAR_STOP_TALKING' }))
-    //
-    // const session = await avatar.createStartAvatar({
-    //   quality: AvatarQuality.High,
-    //   avatarName: 'default',         // use session's avatar_id
-    // })
-    //
-    // // Tell the server the session_id so it can call speak/interrupt
-    // send({ type: 'heygen_session_id', session_id: session.session_id })
-    // send({ type: 'webrtc_ready' })
+    try {
+      const avatar = new StreamingAvatar({ token: accessToken })
+
+      avatar.on(StreamingEvents.STREAM_READY, (e: CustomEvent) => {
+        if (videoRef.current) videoRef.current.srcObject = e.detail
+      })
+
+      avatar.on(StreamingEvents.AVATAR_START_TALKING, () => {
+        send({ type: 'avatar_event', event: 'AVATAR_START_TALKING' })
+      })
+
+      avatar.on(StreamingEvents.AVATAR_STOP_TALKING, () => {
+        send({ type: 'avatar_event', event: 'AVATAR_STOP_TALKING' })
+      })
+
+      const session = await avatar.createStartAvatar({ quality: AvatarQuality.High })
+
+      // Give the server the session_id so it can drive speak/interrupt
+      send({ type: 'heygen_session_id', session_id: (session as { session_id: string }).session_id })
+      send({ type: 'webrtc_ready' })
+    } catch (err) {
+      console.error('HeyGen init failed:', err)
+      send({ type: 'webrtc_ready' })
+    }
   }
 
   const progressPercent =
