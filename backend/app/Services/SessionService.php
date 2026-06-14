@@ -68,6 +68,12 @@ class SessionService
         return $session->fresh();
     }
 
+    public function uploadMedia(UploadedFile $file): array
+    {
+        $path = $file->store('media', 'public');
+        return ['url' => Storage::disk('public')->url($path)];
+    }
+
     private function generateUniqueSlug(): string
     {
         do {

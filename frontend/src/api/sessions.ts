@@ -146,4 +146,12 @@ export const sessionsApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then((r) => r.data)
   },
+
+  uploadMedia: (id: number, file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return api.post<{ url: string }>(`/sessions/${id}/media`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
 }

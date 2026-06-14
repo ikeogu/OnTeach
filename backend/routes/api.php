@@ -49,8 +49,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/sessions/{session}/stats', [DashboardController::class, 'sessionStats']);
     Route::get('/sessions/{session}/logs', [DashboardController::class, 'sessionLogs']);
 
-    // Cover image upload
+    // File uploads
     Route::post('/sessions/{session}/cover', [SessionController::class, 'cover']);
+    Route::post('/sessions/{session}/media', [SessionController::class, 'media']);
 });
 
 // Internal — called by FastAPI (shared secret guard is future work; localhost-only in dev)

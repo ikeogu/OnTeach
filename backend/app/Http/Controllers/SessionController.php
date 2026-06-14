@@ -76,4 +76,15 @@ class SessionController extends Controller
 
         return response()->json($this->sessionService->uploadCover($session, $request->file('cover')));
     }
+
+    public function media(Request $request, Session $session): JsonResponse
+    {
+        $this->authorize('update', $session);
+
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp,mp4,webm', 'max:20480'],
+        ]);
+
+        return response()->json($this->sessionService->uploadMedia($request->file('file')));
+    }
 }

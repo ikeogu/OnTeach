@@ -1,6 +1,9 @@
+import { useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { DraftBlock, SpokenTextPayload, MediaInsertPayload, ActionButtonPayload, PausePayload } from '../../../api/sessions'
+import { sessionsApi } from '../../../api/sessions'
 import { useEditorStore } from '../../../store/editorStore'
 
 interface Props {
@@ -130,19 +133,70 @@ function SpokenTextBody({ block, payload }: { block: DraftBlock; payload: Spoken
 
 function MediaInsertBody({ block, payload }: { block: DraftBlock; payload: MediaInsertPayload }) {
   const updateBlock = useEditorStore((s) => s.updateBlock)
+  const { id } = useParams<{ id: string }>()
+  const sessionId = Number(id)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !sessionId) return
+    setUploading(true)
+    try {
+      const { url } = await sessionsApi.uploadMedia(sessionId, file)
+      updateBlock(block.clientId, { payload: { ...payload, url } })
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
 
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
-        <span className="text-xs font-semibold text-gray-400 uppercase">Image</span>
+        <span className="text-xs font-semibold text-gray-400 uppercase shrink-0">
+          {payload.media_type?.toUpperCase() ?? 'IMAGE'}
+        </span>
         <input
           value={payload.url}
           onChange={(e) => updateBlock(block.clientId, { payload: { ...payload, url: e.target.value } })}
           onClick={(e) => e.stopPropagation()}
-          placeholder="Paste image URL or upload…"
-          className="flex-1 text-sm text-gray-600 bg-transparent outline-none"
+          placeholder="Paste URL…"
+          className="flex-1 text-sm text-gray-600 bg-transparent outline-none min-w-0"
+        />
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); fileRef.current?.click() }}
+          disabled={uploading}
+          className="shrink-0 flex items-center gap-1 text-xs font-medium text-primary hover:text-primary-dark disabled:opacity-50 transition-colors"
+        >
+          {uploading ? (
+            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+          )}
+          {uploading ? 'Uploading…' : 'Upload'}
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm"
+          className="hidden"
+          onChange={handleFile}
         />
       </div>
+
+      {payload.url && (
+        <div className="rounded-lg overflow-hidden border border-gray-200 max-h-32">
+          <img src={payload.url} alt="" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+        </div>
+      )}
+
       <div>
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs text-gray-500">Display duration</span>
