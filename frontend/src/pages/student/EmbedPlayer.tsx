@@ -298,7 +298,7 @@ function ActiveView({
   )
 }
 
-function EmbedQABar({ send }: { send: (msg: object) => void }) {
+function EmbedQABar({ send }: { send: (msg: Record<string, unknown>) => void }) {
   const [text, setText] = useState('')
 
   function submit(e: FormEvent) {
