@@ -91,7 +91,7 @@ async def entrypoint(ctx: JobContext) -> None:
         ),
     )
     tts = deepgram_plugin.TTS(api_key=settings.deepgram_api_key)
-    session = AgentSession(tts=tts, vad=None)
+    session = AgentSession(tts=tts, vad=None, turn_detection=None)
 
     await avatar.start(session, room=ctx.room)
 
