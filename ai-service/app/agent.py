@@ -18,7 +18,7 @@ import re
 import httpx
 from livekit import agents
 from livekit.agents import AgentSession, JobContext, WorkerOptions, RoomInputOptions
-from livekit.plugins import openai as oai_plugin, tavus
+from livekit.plugins import openai as oai_plugin, simli
 
 from .config import settings
 from .services.rag import rag_service
@@ -84,9 +84,11 @@ async def entrypoint(ctx: JobContext) -> None:
     await ctx.connect()
 
     # ── Avatar + TTS ──────────────────────────────────────────────────────────
-    avatar = tavus.AvatarSession(
-        replica_id=settings.tavus_replica_id,
-        persona_id=settings.tavus_persona_id,
+    avatar = simli.AvatarSession(
+        simli_config=simli.SimliConfig(
+            api_key=settings.simli_api_key,
+            face_id=settings.simli_face_id,
+        ),
     )
     tts = oai_plugin.TTS(api_key=settings.openai_api_key, voice="nova")
     session = AgentSession(tts=tts)
