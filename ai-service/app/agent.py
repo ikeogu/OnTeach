@@ -108,9 +108,9 @@ async def entrypoint(ctx: JobContext) -> None:
     pending_action: dict | None = None
 
     # ── Data channel handler ──────────────────────────────────────────────────
-    def on_data(payload: bytes, *_args) -> None:
+    def on_data(data_packet) -> None:
         try:
-            msg = json.loads(payload)
+            msg = json.loads(data_packet.data)
             asyncio.get_event_loop().call_soon_threadsafe(msg_queue.put_nowait, msg)
         except Exception:
             pass
