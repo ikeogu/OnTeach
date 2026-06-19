@@ -53,7 +53,7 @@ export function usePlayerWebSocket(
 
   useEffect(() => {
     if (!lkUrl || !lkToken) return
-    if (connectedRef.current) return
+    if (_room !== null || connectedRef.current) return
 
     const room = new Room()
     _room = room
