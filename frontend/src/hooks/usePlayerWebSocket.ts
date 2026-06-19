@@ -9,7 +9,7 @@
  * the LiveKit room.
  */
 import { useCallback, useEffect, useRef } from 'react'
-import { Room, RoomEvent } from 'livekit-client'
+import { DisconnectReason, Room, RoomEvent } from 'livekit-client'
 import { usePlayerStore } from '../store/playerStore'
 
 type SendFn = (msg: Record<string, unknown>) => void
@@ -68,10 +68,11 @@ export function usePlayerWebSocket(
       }
     })
 
-    room.on(RoomEvent.Disconnected, () => {
+    room.on(RoomEvent.Disconnected, (reason?: DisconnectReason) => {
       connectedRef.current = false
       _room = null
-      setPhase('error', 'Connection closed unexpectedly.')
+      const label = reason !== undefined ? ` (code ${reason}: ${DisconnectReason[reason] ?? reason})` : ''
+      setPhase('error', `Connection closed unexpectedly.${label}`)
     })
 
     room.connect(lkUrl, lkToken).catch((err: unknown) => {
