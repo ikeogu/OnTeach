@@ -17,7 +17,7 @@ import re
 
 import httpx
 from livekit import agents
-from livekit.agents import AgentSession, JobContext, WorkerOptions, RoomInputOptions
+from livekit.agents import Agent, AgentSession, JobContext, WorkerOptions, RoomInputOptions
 from livekit.plugins import openai as oai_plugin, simli
 
 from .config import settings
@@ -96,8 +96,8 @@ async def entrypoint(ctx: JobContext) -> None:
     await avatar.start(session, room=ctx.room)
 
     # Wait for a human participant before starting
-    participant = await ctx.wait_for_participant()
-    await session.start(ctx.room, agent_name="OnTeach", participant=participant)
+    await ctx.wait_for_participant()
+    await session.start(Agent(instructions=""), room=ctx.room)
 
     # ── Shared state ──────────────────────────────────────────────────────────
     msg_queue: asyncio.Queue[dict] = asyncio.Queue()
