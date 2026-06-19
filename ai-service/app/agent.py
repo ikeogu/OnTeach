@@ -18,7 +18,7 @@ import re
 import httpx
 from livekit import agents
 from livekit.agents import Agent, AgentSession, JobContext, WorkerOptions, RoomInputOptions
-from livekit.plugins import openai as oai_plugin, simli
+from livekit.plugins import deepgram as deepgram_plugin, simli
 
 from .config import settings
 from .services.rag import rag_service
@@ -90,7 +90,7 @@ async def entrypoint(ctx: JobContext) -> None:
             face_id=settings.simli_face_id,
         ),
     )
-    tts = oai_plugin.TTS(api_key=settings.openai_api_key, voice="nova")
+    tts = deepgram_plugin.TTS(api_key=settings.deepgram_api_key)
     session = AgentSession(tts=tts)
 
     await avatar.start(session, room=ctx.room)

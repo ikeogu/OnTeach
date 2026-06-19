@@ -17,6 +17,6 @@ python-docx==1.1.2
 python-pptx==1.0.2
 # Chunking / tokenisation
 tiktoken==0.7.0
-# LiveKit Agents + Simli avatar
-livekit-agents[openai,simli]>=1.5
+# LiveKit Agents + Simli avatar (deepgram for TTS, openai>=2 kept for RAG embeddings)
+livekit-agents[deepgram,simli]>=1.5
 livekit-api>=0.7
