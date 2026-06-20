@@ -106,7 +106,7 @@ class RAGService:
 
         for ref in upload_refs:
             upload_id: int = ref["upload_id"]
-            file_path: str = ref["file_path"]
+            file_path: str = ref.get("file_url") or ref.get("file_path", "")
             kind: str = ref.get("kind", "content")
 
             try:

@@ -41,6 +41,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/api/auth/google/callback'),
     ],
 
+    'cloudinary' => [
+        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+        'api_key'    => env('CLOUDINARY_API_KEY'),
+        'api_secret' => env('CLOUDINARY_API_SECRET'),
+    ],
+
     'ai_service' => [
         'url' => env('AI_SERVICE_URL', 'http://127.0.0.1:8001'),
         'ws_url' => env('AI_SERVICE_WS_URL', 'ws://127.0.0.1:8001'),

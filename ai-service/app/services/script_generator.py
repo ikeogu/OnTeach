@@ -1,6 +1,5 @@
 import json
 import re
-from pathlib import Path
 
 import anthropic
 import httpx
@@ -46,22 +45,14 @@ Guidelines:
 """
 
 
-async def _read_file_content(file_path: str) -> str:
-    """Read plain-text content from a local file path."""
-    path = Path(file_path)
-    if not path.exists():
-        return f"[File not found: {file_path}]"
+async def _read_file_content(file_path_or_url: str) -> str:
+    """Read plain-text content from a local path or remote URL."""
+    from .text_extractor import extract_text
 
     try:
-        # For text files, read directly
-        if path.suffix.lower() in {".txt", ".md"}:
-            return path.read_text(errors="ignore")[:40_000]
-
-        # For binary formats (PDF, DOCX, PPTX), return file name as placeholder
-        # Full text extraction (pypdf, python-docx) is added in Milestone 4
-        return f"[Binary file: {path.name} — text extraction will be added in Milestone 4]"
+        return extract_text(file_path_or_url)[:40_000]
     except Exception as e:
-        return f"[Read error: {e}]"
+        return f"[Failed to read {file_path_or_url}: {e}]"
 
 
 async def generate_script(

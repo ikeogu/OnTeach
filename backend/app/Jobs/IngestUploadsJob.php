@@ -28,7 +28,7 @@ class IngestUploadsJob implements ShouldQueue
 
         $refs = array_map(fn (Upload $upload) => [
             'upload_id' => $upload->id,
-            'file_path' => storage_path("app/{$upload->file_path}"),
+            'file_url' => $upload->file_path,
             'kind' => $upload->kind,
             'mime' => $upload->mime,
             'original_name' => $upload->original_name,

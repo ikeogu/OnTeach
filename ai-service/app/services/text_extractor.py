@@ -1,15 +1,42 @@
-"""Extract plain text from PDF, DOCX, PPTX, and TXT files."""
+"""Extract plain text from PDF, DOCX, PPTX, TXT files — local paths or remote URLs."""
+import tempfile
 from pathlib import Path
+from urllib.parse import urlparse
 
 
-def extract_text(file_path: str) -> str:
-    path = Path(file_path)
+def extract_text(file_path_or_url: str) -> str:
+    if file_path_or_url.startswith(("http://", "https://")):
+        return _extract_from_url(file_path_or_url)
+
+    path = Path(file_path_or_url)
     if not path.exists():
-        raise FileNotFoundError(f"File not found: {file_path}")
+        raise FileNotFoundError(f"File not found: {file_path_or_url}")
+    return _extract_by_path(path)
 
+
+def _extract_from_url(url: str) -> str:
+    import httpx
+
+    suffix = Path(urlparse(url).path).suffix.lower() or ".tmp"
+
+    with httpx.Client(timeout=60, follow_redirects=True) as client:
+        resp = client.get(url)
+        resp.raise_for_status()
+
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(resp.content)
+        tmp_path = Path(tmp.name)
+
+    try:
+        return _extract_by_path(tmp_path)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+
+def _extract_by_path(path: Path) -> str:
     suffix = path.suffix.lower()
 
-    if suffix == ".txt" or suffix == ".md":
+    if suffix in {".txt", ".md"}:
         return path.read_text(errors="ignore")
 
     if suffix == ".pdf":
@@ -21,7 +48,6 @@ def extract_text(file_path: str) -> str:
     if suffix in {".pptx", ".ppt"}:
         return _extract_pptx(path)
 
-    # Fallback: attempt plain read
     return path.read_text(errors="ignore")
 
 
@@ -38,7 +64,7 @@ def _extract_pdf(path: Path) -> str:
 
 
 def _extract_docx(path: Path) -> str:
-    import docx  # python-docx
+    import docx
 
     doc = docx.Document(str(path))
     return "\n\n".join(p.text for p in doc.paragraphs if p.text.strip())
