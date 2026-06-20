@@ -199,14 +199,21 @@ export default function SessionDetail() {
         />
       )}
       {tab === 'script' && (
-        <div className="text-center py-16">
-          <p className="text-gray-500 text-sm mb-3">{blocks.length} script blocks total.</p>
-          <button
-            onClick={() => navigate(`/dashboard/sessions/${sessionId}/edit`)}
-            className="text-primary text-sm font-medium hover:underline"
-          >
-            Open Script Editor →
-          </button>
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-gray-500">{blocks.length} blocks</p>
+            <button
+              onClick={() => navigate(`/dashboard/sessions/${sessionId}/edit`)}
+              className="text-sm text-primary font-medium hover:underline"
+            >
+              Edit in Script Editor →
+            </button>
+          </div>
+          <div className="space-y-3">
+            {blocks.map((block, idx) => (
+              <ScriptBlockRow key={block.id} block={block} index={idx} />
+            ))}
+          </div>
         </div>
       )}
       {tab === 'analytics' && (
@@ -239,6 +246,44 @@ export default function SessionDetail() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+const BLOCK_META: Record<string, { label: string; color: string; icon: ReactNode }> = {
+  spoken_text:   { label: 'Speech',  color: 'bg-blue-50 text-blue-600 border-blue-100',   icon: <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z M6 10.5v1.5a6 6 0 0012 0v-1.5" /> },
+  media_insert:  { label: 'Media',   color: 'bg-purple-50 text-purple-600 border-purple-100', icon: <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /> },
+  action_button: { label: 'Action',  color: 'bg-amber-50 text-amber-600 border-amber-100',  icon: <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59" /> },
+  pause:         { label: 'Pause',   color: 'bg-gray-50 text-gray-500 border-gray-100',    icon: <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" /> },
+}
+
+function ScriptBlockRow({ block, index }: { block: import('../../api/sessions').ScriptBlock; index: number }) {
+  const meta = BLOCK_META[block.type] ?? BLOCK_META.pause
+  const p = block.payload as any
+
+  let preview = ''
+  if (block.type === 'spoken_text') preview = p.text ?? ''
+  else if (block.type === 'media_insert') preview = p.spoken_text || p.url || ''
+  else if (block.type === 'action_button') preview = `${p.label} → ${p.target}`
+  else if (block.type === 'pause') preview = `${p.duration_seconds ?? 2}s pause`
+
+  return (
+    <div className={`flex items-start gap-3 bg-white border rounded-xl px-4 py-3.5 ${meta.color.split(' ')[2] ?? 'border-gray-100'}`}>
+      <span className="text-xs text-gray-300 font-mono w-5 pt-0.5 shrink-0">{index + 1}</span>
+      <div className={`w-7 h-7 rounded-lg border flex items-center justify-center shrink-0 ${meta.color}`}>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          {meta.icon}
+        </svg>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${meta.color}`}>{meta.label}</span>
+          {block.bookmark_label && (
+            <span className="text-xs text-gray-400 font-medium">📍 {block.bookmark_label}</span>
+          )}
+        </div>
+        <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed">{preview}</p>
+      </div>
     </div>
   )
 }
