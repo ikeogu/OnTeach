@@ -289,13 +289,19 @@ async def entrypoint(ctx: JobContext) -> None:
                 # Stream RAG answer
                 current_block_text = (block.get("payload") or {}).get("text", "")
                 answer_parts: list[str] = []
-                async for token in rag_service.stream_query(
-                    session_id=session_id,
-                    question=question,
-                    current_block_text=current_block_text,
-                ):
-                    await send({"type": "qa_answer_chunk", "text": token})
-                    answer_parts.append(token)
+                try:
+                    async for token in rag_service.stream_query(
+                        session_id=session_id,
+                        question=question,
+                        current_block_text=current_block_text,
+                    ):
+                        await send({"type": "qa_answer_chunk", "text": token})
+                        answer_parts.append(token)
+                except Exception as exc:
+                    log.error("RAG query failed: %s", exc)
+                    fallback = "I'm sorry, I couldn't retrieve an answer right now. Let's continue the session."
+                    await send({"type": "qa_answer_chunk", "text": fallback})
+                    answer_parts = [fallback]
 
                 full_answer = "".join(answer_parts)
                 await send({"type": "qa_answer_done"})
