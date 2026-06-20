@@ -133,10 +133,10 @@ export default function SessionDetail() {
       </Link>
 
       {/* Session header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
           <div
-            className="w-16 h-16 rounded-xl shrink-0 flex items-center justify-center text-white text-xl font-bold overflow-hidden"
+            className="w-14 h-14 md:w-16 md:h-16 rounded-xl shrink-0 flex items-center justify-center text-white text-xl font-bold overflow-hidden"
             style={
               session.cover_image_url
                 ? { backgroundImage: `url(${session.cover_image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
@@ -157,24 +157,24 @@ export default function SessionDetail() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => navigate(`/dashboard/sessions/${sessionId}/edit`)}
-            className="border border-gray-200 text-gray-700 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+            className="border border-gray-200 text-gray-700 text-sm font-semibold px-3 md:px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            Edit Session
+            Edit
           </button>
           <button
             onClick={() => setTab('overview')}
-            className="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            className="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-3 md:px-4 py-2 rounded-lg transition-colors"
           >
-            Share &amp; Embed
+            Share
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-gray-200 mb-6">
+      <div className="flex gap-4 md:gap-6 border-b border-gray-200 mb-6 overflow-x-auto">
         {(['overview', 'script', 'analytics', 'settings'] as Tab[]).map((t) => (
           <button
             key={t}
@@ -271,7 +271,7 @@ function AnalyticsTab({
   return (
     <div>
       {/* Stat row */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
         <AnalyticCard
           label="TOTAL VIEWS"
           value={sessionStats ? sessionStats.total_joins.toLocaleString() : '—'}
@@ -291,9 +291,9 @@ function AnalyticsTab({
         />
       </div>
 
-      <div className="grid grid-cols-5 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-5">
         {/* Raise Hand Heatmap */}
-        <div className="col-span-3 bg-white rounded-xl border border-gray-200 p-5">
+        <div className="md:col-span-3 bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-900 text-sm mb-1">Raise Hand Heatmap</h3>
           <p className="text-xs text-gray-400 mb-6">Where viewers ask the most questions in your script.</p>
 
@@ -324,7 +324,7 @@ function AnalyticsTab({
         </div>
 
         {/* Most Common Questions */}
-        <div className="col-span-2 bg-white rounded-xl border border-gray-200 p-5">
+        <div className="md:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-900 text-sm mb-4">Questions Asked</h3>
           {logs.length === 0 ? (
             <p className="text-gray-400 text-sm">No questions yet.</p>
@@ -412,7 +412,7 @@ function OverviewTab({
   return (
     <div>
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
         <MiniStatCard label="Total Joins" value={sessionStats ? sessionStats.total_joins.toLocaleString() : '—'} icon={<SessionsIcon />} />
         <MiniStatCard label="Completions" value={sessionStats ? sessionStats.total_completions.toLocaleString() : '—'} icon={<StudentsIcon />} />
         <MiniStatCard label="Questions Asked" value={sessionStats ? sessionStats.questions_asked.toLocaleString() : '—'} icon={<QuestionsIcon />} />
@@ -420,9 +420,9 @@ function OverviewTab({
       </div>
 
       {/* Two-column */}
-      <div className="grid grid-cols-5 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-5">
         {/* Left: Share & Embed + AI Insights promo */}
-        <div className="col-span-3 space-y-4">
+        <div className="md:col-span-3 space-y-4">
           {/* Share & Embed */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <h3 className="font-semibold text-gray-900 text-sm mb-0.5">Share &amp; Embed</h3>
@@ -453,7 +453,7 @@ function OverviewTab({
         </div>
 
         {/* Right: Recent Activity */}
-        <div className="col-span-2 bg-white rounded-xl border border-gray-200 p-5">
+        <div className="md:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="font-semibold text-gray-900 text-sm">Recent Activity</h3>

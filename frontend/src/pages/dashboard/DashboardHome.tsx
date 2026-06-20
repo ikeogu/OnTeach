@@ -48,17 +48,17 @@ export default function DashboardHome() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{greeting}, {firstName}</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">{greeting}, {firstName}</h1>
           <p className="text-gray-500 text-sm mt-0.5">Here's what's happening with your sessions today.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 text-sm font-medium px-3.5 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button className="hidden sm:flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 text-sm font-medium px-3.5 py-2 rounded-lg hover:bg-gray-50 transition-colors">
             <CalendarIcon />
             Past 30 Days
           </button>
-          <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 text-sm font-medium px-3.5 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+          <button className="hidden sm:flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 text-sm font-medium px-3.5 py-2 rounded-lg hover:bg-gray-50 transition-colors">
             <ExportIcon />
             Export
           </button>
@@ -75,7 +75,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
         <StatCard
           label="Total Sessions"
           value={stats ? stats.total_sessions.toString() : sessions.length.toString()}
@@ -100,7 +100,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Recent Sessions */}
-      <div className="bg-white rounded-xl border border-gray-200 mb-5">
+      <div className="bg-white rounded-xl border border-gray-200 mb-5 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <h2 className="font-semibold text-gray-900 text-sm">Recent Sessions</h2>
           <button
@@ -124,30 +124,32 @@ export default function DashboardHome() {
             </button>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-100">
-                <th className="px-5 py-3 text-left">Session</th>
-                <th className="px-5 py-3 text-left">Mode</th>
-                <th className="px-5 py-3 text-left">Status</th>
-                <th className="px-5 py-3 text-left">Viewers</th>
-                <th className="px-5 py-3 text-left">Created</th>
-                <th className="px-5 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {sessions.slice(0, 5).map((s) => (
-                <SessionRow key={s.id} session={s} />
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[560px]">
+              <thead>
+                <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                  <th className="px-5 py-3 text-left">Session</th>
+                  <th className="px-5 py-3 text-left hidden sm:table-cell">Mode</th>
+                  <th className="px-5 py-3 text-left">Status</th>
+                  <th className="px-5 py-3 text-left hidden md:table-cell">Viewers</th>
+                  <th className="px-5 py-3 text-left hidden md:table-cell">Created</th>
+                  <th className="px-5 py-3" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {sessions.slice(0, 5).map((s) => (
+                  <SessionRow key={s.id} session={s} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
       {/* Bottom row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Engagement Insights */}
-        <div className="col-span-2 bg-white rounded-xl border border-gray-200 p-5">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-primary text-base">✦</span>
             <h2 className="font-semibold text-gray-900 text-sm">Engagement Insights</h2>
@@ -259,7 +261,7 @@ function SessionRow({ session }: { session: Session }) {
           <span className="font-medium text-gray-800 line-clamp-1">{session.name}</span>
         </div>
       </td>
-      <td className="px-5 py-3.5">
+      <td className="px-5 py-3.5 hidden sm:table-cell">
         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${MODE_COLORS[session.mode]}`}>
           {MODE_LABELS[session.mode]}
         </span>
@@ -270,10 +272,10 @@ function SessionRow({ session }: { session: Session }) {
           {session.status === 'active' ? 'Active' : 'Draft'}
         </span>
       </td>
-      <td className="px-5 py-3.5 text-gray-600 text-sm font-medium">
+      <td className="px-5 py-3.5 text-gray-600 text-sm font-medium hidden md:table-cell">
         {session.total_joins != null ? session.total_joins.toLocaleString() : '—'}
       </td>
-      <td className="px-5 py-3.5 text-gray-500 text-sm">{timeAgo(session.created_at)}</td>
+      <td className="px-5 py-3.5 text-gray-500 text-sm hidden md:table-cell">{timeAgo(session.created_at)}</td>
       <td className="px-5 py-3.5">
         <button className="text-gray-400 hover:text-gray-600 p-1" onClick={(e) => e.stopPropagation()}>
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">

@@ -136,7 +136,7 @@ export default function AvatarVoice() {
           <p className="text-gray-500 text-sm mb-6">Select the digital persona that best represents your teaching style.</p>
 
           {/* Avatar grid */}
-          <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
             {AVATARS.map((av) => {
               const selected = av.id === avatarId
               return (
@@ -151,7 +151,7 @@ export default function AvatarVoice() {
                 >
                   {/* Avatar photo placeholder */}
                   <div
-                    className={`w-20 h-20 rounded-xl flex items-center justify-center text-2xl font-bold transition-all ${
+                    className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl flex items-center justify-center text-xl font-bold transition-all ${
                       selected ? '' : 'grayscale opacity-60'
                     }`}
                     style={{ backgroundColor: av.color }}

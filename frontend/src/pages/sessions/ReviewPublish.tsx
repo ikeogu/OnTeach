@@ -189,9 +189,9 @@ export default function ReviewPublish() {
           <p className="text-gray-500 text-sm mb-7">Review your session before publishing. You can always edit it later.</p>
 
           {/* Two-column layout */}
-          <div className="flex gap-5">
+          <div className="flex flex-col sm:flex-row gap-5">
             {/* Cover image */}
-            <div className="w-44 flex-shrink-0">
+            <div className="w-full sm:w-44 flex-shrink-0">
               <div
                 className="w-full h-36 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[#5b5bd6]/40 transition-colors overflow-hidden relative"
                 onClick={() => fileRef.current?.click()}

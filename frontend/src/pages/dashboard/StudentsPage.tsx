@@ -24,7 +24,7 @@ export default function StudentsPage() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 px-5 py-4">
           <p className="text-xs text-gray-500 font-medium mb-2">Total Joins</p>
           <p className="text-2xl font-bold text-gray-900">{total.toLocaleString()}</p>
@@ -40,7 +40,7 @@ export default function StudentsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         {isLoading ? (
           <div className="py-12 text-center text-gray-400 text-sm">Loading…</div>
         ) : students.length === 0 ? (
@@ -60,22 +60,24 @@ export default function StudentsPage() {
             </button>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-100">
-                <th className="px-5 py-3 text-left">Viewer</th>
-                <th className="px-5 py-3 text-left">Session</th>
-                <th className="px-5 py-3 text-left">Joined</th>
-                <th className="px-5 py-3 text-left">Status</th>
-                <th className="px-5 py-3 text-left">Duration</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {students.map((s) => (
-                <StudentRow key={s.id} student={s} onSessionClick={() => navigate(`/dashboard/sessions/${s.session_id}`)} />
-              ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[480px]">
+              <thead>
+                <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                  <th className="px-5 py-3 text-left">Viewer</th>
+                  <th className="px-5 py-3 text-left hidden sm:table-cell">Session</th>
+                  <th className="px-5 py-3 text-left hidden md:table-cell">Joined</th>
+                  <th className="px-5 py-3 text-left">Status</th>
+                  <th className="px-5 py-3 text-left hidden md:table-cell">Duration</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {students.map((s) => (
+                  <StudentRow key={s.id} student={s} onSessionClick={() => navigate(`/dashboard/sessions/${s.session_id}`)} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
@@ -97,15 +99,15 @@ function StudentRow({ student, onSessionClick }: { student: StudentRecord; onSes
           <span className="font-medium text-gray-800">{student.student_name}</span>
         </div>
       </td>
-      <td className="px-5 py-3.5">
+      <td className="px-5 py-3.5 hidden sm:table-cell">
         <button
           onClick={onSessionClick}
-          className="text-primary hover:underline text-sm font-medium"
+          className="text-primary hover:underline text-sm font-medium line-clamp-1 text-left"
         >
           {student.session_name}
         </button>
       </td>
-      <td className="px-5 py-3.5 text-gray-500 text-sm">{timeAgo(student.started_at)}</td>
+      <td className="px-5 py-3.5 text-gray-500 text-sm hidden md:table-cell">{timeAgo(student.started_at)}</td>
       <td className="px-5 py-3.5">
         {student.completed_at ? (
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-600">
@@ -119,7 +121,7 @@ function StudentRow({ student, onSessionClick }: { student: StudentRecord; onSes
           </span>
         )}
       </td>
-      <td className="px-5 py-3.5 text-gray-500 text-sm">
+      <td className="px-5 py-3.5 text-gray-500 text-sm hidden md:table-cell">
         {duration != null ? `${duration} min` : '—'}
       </td>
     </tr>
