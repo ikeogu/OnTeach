@@ -46,7 +46,7 @@ export default function GeneratingScript() {
   useEffect(() => {
     if (data?.status === 'done') {
       setDisplayProgress(100)
-      setTimeout(() => navigate(`/dashboard/sessions/${sessionId}/edit`), 600)
+      setTimeout(() => navigate(`/dashboard/sessions/${sessionId}/edit`), 2500)
     }
     if (data?.status === 'failed') {
       // Let user go back
@@ -58,7 +58,7 @@ export default function GeneratingScript() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="h-14 bg-white border-b border-gray-200 flex items-center px-6">
-        <span className="font-bold text-primary text-lg">Onteach</span>
+        <span className="font-bold text-primary text-lg">Veologue</span>
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">

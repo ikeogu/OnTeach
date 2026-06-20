@@ -70,7 +70,7 @@ export default function CreateSession() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-50 flex flex-col">
       {/* Top bar */}
       <header className="h-14 bg-white border-b border-gray-200 flex items-center px-6">
-        <span className="font-bold text-primary text-lg">Onteach</span>
+        <span className="font-bold text-primary text-lg">Veologue</span>
         <div className="ml-auto flex items-center gap-3">
           <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={1.5}>

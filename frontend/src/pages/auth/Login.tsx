@@ -32,7 +32,7 @@ export default function Login() {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       <div className="mb-8 flex items-center gap-2">
         <span className="w-3 h-3 rounded-full bg-primary inline-block" />
-        <span className="font-semibold text-gray-900 text-lg">Onteach</span>
+        <span className="font-semibold text-gray-900 text-lg">Veologue</span>
       </div>
 
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">

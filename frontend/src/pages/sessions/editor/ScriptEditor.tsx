@@ -122,7 +122,7 @@ export default function ScriptEditor() {
         {/* Top bar */}
         <header className="h-13 border-b border-gray-200 flex items-center px-5 gap-3 shrink-0">
           <button onClick={() => navigate('/dashboard')} className="font-bold text-primary text-base hover:opacity-80">
-            Onteach
+            Veologue
           </button>
           <span className="text-gray-300">·</span>
           <span className="text-sm font-medium text-gray-700 truncate">{session?.name ?? '…'}</span>

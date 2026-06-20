@@ -30,7 +30,7 @@ export default function AccountType() {
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest text-center mb-2">
           Step 1 of 2
         </p>
-        <h1 className="text-2xl font-bold text-gray-900 text-center mb-1">How will you use Onteach?</h1>
+        <h1 className="text-2xl font-bold text-gray-900 text-center mb-1">How will you use Veologue?</h1>
         <p className="text-gray-500 text-sm text-center mb-6">You can always change this later.</p>
 
         <div className="grid grid-cols-2 gap-3 mb-6">
@@ -91,7 +91,7 @@ export default function AccountType() {
         </button>
       </div>
 
-      <p className="text-xs text-gray-400 mt-6">Onteach Platform Registration</p>
+      <p className="text-xs text-gray-400 mt-6">Veologue Platform Registration</p>
     </div>
   )
 }

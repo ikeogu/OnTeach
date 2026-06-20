@@ -1,7 +1,59 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sessionsApi } from '../../api/sessions'
+
+const PUBLISH_STEPS = [
+  'Saving your settings…',
+  'Preparing your avatar…',
+  'Activating your session…',
+  'Almost ready…',
+]
+
+function PublishingScreen() {
+  const [stepIndex, setStepIndex] = useState(0)
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    const t = setInterval(() => setStepIndex((i) => (i + 1) % PUBLISH_STEPS.length), 700)
+    return () => clearInterval(t)
+  }, [])
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setProgress((p) => (p < 90 ? Math.min(p + 4, 90) : p))
+    }, 100)
+    return () => clearInterval(t)
+  }, [])
+
+  return (
+    <div className="fixed inset-0 bg-gray-50 flex flex-col z-50">
+      <header className="bg-white border-b border-gray-200 px-6 py-3">
+        <span className="font-bold text-[#5b5bd6] text-lg">Veologue</span>
+      </header>
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
+        <div className="relative w-24 h-24 mb-10">
+          <svg className="w-24 h-24 -rotate-90" viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r="40" fill="none" stroke="#e9e9f7" strokeWidth="10" />
+            <circle
+              cx="48" cy="48" r="40" fill="none"
+              stroke="#5b5bd6" strokeWidth="10"
+              strokeDasharray={2 * Math.PI * 40}
+              strokeDashoffset={2 * Math.PI * 40 * (1 - progress / 100)}
+              strokeLinecap="round"
+              style={{ transition: 'stroke-dashoffset 0.2s ease' }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-lg font-bold text-[#5b5bd6]">{progress}%</span>
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Publishing your session…</h1>
+        <p className="text-gray-400 text-sm">{PUBLISH_STEPS[stepIndex]}</p>
+      </div>
+    </div>
+  )
+}
 
 const AVATAR_NAMES: Record<string, string> = {
   Anna_public_3_20240108: 'Sophie',
@@ -56,6 +108,7 @@ export default function ReviewPublish() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const fileRef = useRef<HTMLInputElement>(null)
+  const [publishing, setPublishing] = useState(false)
 
   const { data: session } = useQuery({
     queryKey: ['session', sessionId],
@@ -90,7 +143,8 @@ export default function ReviewPublish() {
     mutationFn: () => sessionsApi.publish(sessionId),
     onSuccess: (published) => {
       qc.setQueryData(['session', sessionId], published)
-      navigate(`/dashboard/sessions/${sessionId}/published`)
+      setPublishing(true)
+      setTimeout(() => navigate(`/dashboard/sessions/${sessionId}/published`), 2500)
     },
   })
 
@@ -100,11 +154,13 @@ export default function ReviewPublish() {
   const modeName = session?.mode ? (MODE_LABELS[session.mode] ?? session.mode) : '—'
   const blockCount = blocks?.length ?? 0
 
+  if (publishing) return <PublishingScreen />
+
   return (
     <div className="min-h-screen bg-[#f8f8f8] flex flex-col">
       {/* Top bar */}
       <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-        <span className="font-bold text-[#5b5bd6] text-lg">Onteach</span>
+        <span className="font-bold text-[#5b5bd6] text-lg">Veologue</span>
         <div className="flex items-center gap-3 text-gray-400">
           <button className="w-8 h-8 flex items-center justify-center hover:text-gray-600">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

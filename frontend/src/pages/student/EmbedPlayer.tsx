@@ -157,7 +157,7 @@ function JoinView({
 
         <div className="bg-gray-50 px-5 py-2.5 text-center border-t border-gray-100">
           <span className="text-xs text-gray-400">Powered by </span>
-          <span className="text-xs font-bold text-[#5b5bd6]">Onteach</span>
+          <span className="text-xs font-bold text-[#5b5bd6]">Veologue</span>
         </div>
       </div>
     </div>
@@ -193,7 +193,7 @@ function ActiveView({
           <p className="text-white font-bold text-lg">Session Complete</p>
           <p className="text-white/50 text-sm mt-1">Great work, {store.studentName}!</p>
         </div>
-        <span className="text-xs text-white/30 mt-4">Powered by <span className="text-[#5b5bd6] font-semibold">Onteach</span></span>
+        <span className="text-xs text-white/30 mt-4">Powered by <span className="text-[#5b5bd6] font-semibold">Veologue</span></span>
       </div>
     )
   }
@@ -287,7 +287,7 @@ function ActiveView({
         </div>
 
         <span className="text-xs text-white/30">
-          Powered by <span className="text-[#5b5bd6] font-semibold">Onteach</span>
+          Powered by <span className="text-[#5b5bd6] font-semibold">Veologue</span>
         </span>
       </div>
 

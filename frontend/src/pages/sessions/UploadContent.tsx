@@ -47,7 +47,7 @@ export default function UploadContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-50 flex flex-col">
       <header className="h-14 bg-white border-b border-gray-200 flex items-center px-6">
-        <span className="font-bold text-primary text-lg">Onteach</span>
+        <span className="font-bold text-primary text-lg">Veologue</span>
       </header>
 
       <div className="flex-1 flex items-start justify-center px-4 py-10">

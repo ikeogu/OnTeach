@@ -10,7 +10,7 @@ export default function Welcome() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
         <div className="text-4xl mb-4">✦ ✦</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Onteach, {firstName}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Veologue, {firstName}</h1>
         <p className="text-gray-500 text-sm mb-8">
           You're all set. Create your first session and see how it works.
         </p>
