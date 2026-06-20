@@ -41,17 +41,21 @@ class AuthService
 
     public function findOrCreateFromGoogle(SocialiteUser $googleUser): array
     {
+        $isNew = ! User::where('email', $googleUser->getEmail())->exists();
+
         $user = User::updateOrCreate(
             ['email' => $googleUser->getEmail()],
             [
-                'name' => $googleUser->getName(),
-                'google_id' => $googleUser->getId(),
+                'name'              => $googleUser->getName(),
+                'google_id'         => $googleUser->getId(),
+                'email_verified_at' => now(),
             ]
         );
 
         return [
-            'user' => $user,
-            'token' => $user->createToken('auth')->plainTextToken,
+            'user'   => $user,
+            'token'  => $user->createToken('auth')->plainTextToken,
+            'is_new' => $isNew,
         ];
     }
 }

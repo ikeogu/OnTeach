@@ -21,6 +21,7 @@ import SessionLoading from './pages/student/SessionLoading'
 import ActiveSession from './pages/student/ActiveSession'
 import EmbedPlayer from './pages/student/EmbedPlayer'
 import StudentsPage from './pages/dashboard/StudentsPage'
+import GoogleCallback from './pages/auth/GoogleCallback'
 import HomePage from './pages/marketing/HomePage'
 import FeaturesPage from './pages/marketing/FeaturesPage'
 import PricingPage from './pages/marketing/PricingPage'
@@ -34,6 +35,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          {/* Google OAuth callback — must be outside GuestGuard */}
+          <Route path="/auth/google/callback" element={<GoogleCallback />} />
+
           {/* Guest-only */}
           <Route element={<GuestGuard />}>
             <Route path="/signup" element={<SignUp />} />

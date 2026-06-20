@@ -1,15 +1,18 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '../../api/auth'
 import { useAuthStore } from '../../store/authStore'
 
 export default function Login() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const setAuth = useAuthStore((s) => s.setAuth)
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState<Record<string, string[]>>({})
+
+  const googleError = searchParams.get('error') === 'google_failed'
 
   const mutation = useMutation({
     mutationFn: authApi.login,
@@ -38,6 +41,12 @@ export default function Login() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-1">Welcome back</h1>
         <p className="text-gray-500 text-sm text-center mb-6">Sign in to your account.</p>
+
+        {googleError && (
+          <p className="text-red-500 text-sm text-center bg-red-50 rounded-lg px-3 py-2.5 mb-4">
+            Google sign-in failed. Please try again.
+          </p>
+        )}
 
         <a
           href={authApi.googleRedirectUrl()}
