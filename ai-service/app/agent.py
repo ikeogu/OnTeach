@@ -106,16 +106,25 @@ async def entrypoint(ctx: JobContext) -> None:
     resume_ev = asyncio.Event()
     resume_ev.set()
     pending_action: dict | None = None
+    current_speech: list = [None]  # holds the active SpeechHandle so dispatch can interrupt it
 
     # ── Data channel handler ──────────────────────────────────────────────────
     def on_data(data_packet) -> None:
         try:
             msg = json.loads(data_packet.data)
-            asyncio.get_event_loop().call_soon_threadsafe(msg_queue.put_nowait, msg)
+            msg_queue.put_nowait(msg)  # already on the event loop thread
         except Exception:
             pass
 
     ctx.room.on("data_received", on_data)
+
+    def _interrupt_speech() -> None:
+        h = current_speech[0]
+        if h is not None and not h.done():
+            try:
+                h.interrupt()
+            except Exception:
+                pass
 
     async def dispatch_loop() -> None:
         nonlocal pending_action
@@ -124,13 +133,17 @@ async def entrypoint(ctx: JobContext) -> None:
             t = msg.get("type")
             if t == "raise_hand":
                 pending_action = {"type": "raise_hand"}
+                _interrupt_speech()
                 interrupted.set()
             elif t == "submit_question":
                 await question_queue.put(msg.get("text", ""))
             elif t == "skip_to_section":
                 pending_action = {"type": "skip_to_section", "block_id": msg.get("block_id")}
+                _interrupt_speech()
                 interrupted.set()
             elif t == "pause":
+                _interrupt_speech()
+                interrupted.set()
                 resume_ev.clear()
             elif t == "resume":
                 resume_ev.set()
@@ -149,6 +162,7 @@ async def entrypoint(ctx: JobContext) -> None:
     async def speak_and_wait(text: str) -> None:
         interrupted.clear()
         handle = session.say(text)
+        current_speech[0] = handle
         playout_task = asyncio.create_task(handle.wait_for_playout())
         interrupt_task = asyncio.create_task(interrupted.wait())
         done, pending = await asyncio.wait(
@@ -162,6 +176,7 @@ async def entrypoint(ctx: JobContext) -> None:
                 await t
             except asyncio.CancelledError:
                 pass
+        current_speech[0] = None
         if not interrupted.is_set():
             await send({"type": "avatar_speaking", "state": "stop"})
 
@@ -215,7 +230,11 @@ async def entrypoint(ctx: JobContext) -> None:
             await speak_and_wait(payload.get("text", ""))
 
         elif btype == "pause":
-            await asyncio.sleep(float(payload.get("duration_seconds", 2)))
+            duration = float(payload.get("duration_seconds", 2))
+            try:
+                await asyncio.wait_for(interrupted.wait(), timeout=duration)
+            except asyncio.TimeoutError:
+                pass
 
         elif btype == "media_insert":
             await send({
@@ -229,7 +248,11 @@ async def entrypoint(ctx: JobContext) -> None:
                 await send({"type": "avatar_speaking", "state": "start"})
                 await speak_and_wait(spoken)
             else:
-                await asyncio.sleep(float(payload.get("display_duration", 10)))
+                duration = float(payload.get("display_duration", 10))
+                try:
+                    await asyncio.wait_for(interrupted.wait(), timeout=duration)
+                except asyncio.TimeoutError:
+                    pass
 
         elif btype == "action_button":
             await send({
