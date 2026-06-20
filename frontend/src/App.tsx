@@ -22,6 +22,8 @@ import ActiveSession from './pages/student/ActiveSession'
 import EmbedPlayer from './pages/student/EmbedPlayer'
 import StudentsPage from './pages/dashboard/StudentsPage'
 import GoogleCallback from './pages/auth/GoogleCallback'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
 import HomePage from './pages/marketing/HomePage'
 import FeaturesPage from './pages/marketing/FeaturesPage'
 import PricingPage from './pages/marketing/PricingPage'
@@ -37,6 +39,10 @@ export default function App() {
         <Routes>
           {/* Google OAuth callback — must be outside GuestGuard */}
           <Route path="/auth/google/callback" element={<GoogleCallback />} />
+
+          {/* Password reset — public, outside GuestGuard so existing sessions don't redirect */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Guest-only */}
           <Route element={<GuestGuard />}>

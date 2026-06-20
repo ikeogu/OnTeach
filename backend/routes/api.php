@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InternalSessionController;
 use App\Http\Controllers\PublicSessionController;
@@ -16,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 // Auth
 Route::post('/auth/register', RegisterController::class);
 Route::post('/auth/login', LoginController::class);
+Route::post('/auth/forgot-password', ForgotPasswordController::class);
+Route::post('/auth/reset-password', ResetPasswordController::class);
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 

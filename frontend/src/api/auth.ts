@@ -23,6 +23,12 @@ export const authApi = {
   me: (token?: string) =>
     api.get<User>('/me', token ? { headers: { Authorization: `Bearer ${token}` } } : undefined).then((r) => r.data),
 
+  forgotPassword: (data: { email: string }) =>
+    api.post<{ message: string }>('/auth/forgot-password', data).then((r) => r.data),
+
+  resetPassword: (data: { token: string; email: string; password: string; password_confirmation: string }) =>
+    api.post<{ message: string }>('/auth/reset-password', data).then((r) => r.data),
+
   googleRedirectUrl: () =>
     `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api'}/auth/google/redirect`,
 }
