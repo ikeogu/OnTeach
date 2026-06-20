@@ -105,7 +105,7 @@ export default function SessionPublished() {
 
           {/* Share text */}
           <p className="text-center text-gray-500 text-sm mb-5">
-            Share the link with your students or embed it<br />directly into your course platform.
+            Share the link with your viewers or embed it<br />directly into your course platform.
           </p>
 
           {/* Share / Embed fields */}

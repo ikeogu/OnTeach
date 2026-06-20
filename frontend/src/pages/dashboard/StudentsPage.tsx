@@ -18,7 +18,7 @@ export default function StudentsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Students</h1>
+          <h1 className="text-xl font-bold text-gray-900">Viewers</h1>
           <p className="text-gray-500 text-sm mt-0.5">Everyone who has joined your sessions.</p>
         </div>
       </div>
@@ -50,8 +50,8 @@ export default function StudentsPage() {
                 <circle cx="9" cy="7" r="4" /><path strokeLinecap="round" d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2" />
               </svg>
             </div>
-            <p className="text-gray-400 text-sm mb-1">No students yet.</p>
-            <p className="text-gray-400 text-xs">Share a published session to get your first student.</p>
+            <p className="text-gray-400 text-sm mb-1">No viewers yet.</p>
+            <p className="text-gray-400 text-xs">Share a published session to get your first viewer.</p>
             <button
               onClick={() => navigate('/dashboard/sessions')}
               className="mt-3 text-primary text-sm font-medium hover:underline"
@@ -63,7 +63,7 @@ export default function StudentsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-100">
-                <th className="px-5 py-3 text-left">Student</th>
+                <th className="px-5 py-3 text-left">Viewer</th>
                 <th className="px-5 py-3 text-left">Session</th>
                 <th className="px-5 py-3 text-left">Joined</th>
                 <th className="px-5 py-3 text-left">Status</th>

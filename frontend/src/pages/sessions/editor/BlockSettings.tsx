@@ -76,7 +76,7 @@ export default function BlockSettings() {
             placeholder="e.g. Introduction"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary"
           />
-          <p className="text-xs text-gray-400 mt-1">Students can skip to this section.</p>
+          <p className="text-xs text-gray-400 mt-1">Viewers can skip to this section.</p>
         </div>
       </div>
     )

@@ -82,7 +82,7 @@ export default function DashboardHome() {
           icon={<SessionsIcon />}
         />
         <StatCard
-          label="Total Students"
+          label="Total Viewers"
           value={stats ? stats.total_students.toLocaleString() : '—'}
           icon={<StudentsIcon />}
         />
@@ -130,7 +130,7 @@ export default function DashboardHome() {
                 <th className="px-5 py-3 text-left">Session</th>
                 <th className="px-5 py-3 text-left">Mode</th>
                 <th className="px-5 py-3 text-left">Status</th>
-                <th className="px-5 py-3 text-left">Students</th>
+                <th className="px-5 py-3 text-left">Viewers</th>
                 <th className="px-5 py-3 text-left">Created</th>
                 <th className="px-5 py-3" />
               </tr>
@@ -154,21 +154,21 @@ export default function DashboardHome() {
           </div>
 
           {sessions.length === 0 ? (
-            <p className="text-gray-400 text-sm">Insights will appear once your sessions have student activity.</p>
+            <p className="text-gray-400 text-sm">Insights will appear once your sessions have viewer activity.</p>
           ) : (
             <div className="flex gap-4">
               {/* Insight cards */}
               <div className="flex-1 space-y-3">
                 <div className="border border-primary/30 bg-primary-light rounded-xl p-4">
-                  <p className="text-sm font-semibold text-primary mb-1">Strong Student Participation</p>
+                  <p className="text-sm font-semibold text-primary mb-1">Strong Viewer Participation</p>
                   <p className="text-xs text-gray-500 leading-relaxed">
-                    Students are asking questions, which signals high engagement with your content.
+                    Viewers are asking questions, which signals high engagement with your content.
                   </p>
                 </div>
                 <div className="border border-gray-200 rounded-xl p-4">
                   <p className="text-sm font-semibold text-gray-700 mb-1">Grow Your Audience</p>
                   <p className="text-xs text-gray-500 leading-relaxed">
-                    Share your sessions with more students to gather richer engagement data.
+                    Share your sessions with more viewers to gather richer engagement data.
                   </p>
                 </div>
               </div>
@@ -193,7 +193,7 @@ export default function DashboardHome() {
                 </div>
                 <p className="text-xs text-gray-400 text-center leading-tight">
                   {retentionPct != null
-                    ? 'Student completion rate across all sessions.'
+                    ? 'Viewer completion rate across all sessions.'
                     : 'Complete sessions will show retention.'}
                 </p>
               </div>
@@ -203,7 +203,7 @@ export default function DashboardHome() {
 
         {/* Student Activity */}
         <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h2 className="font-semibold text-gray-900 text-sm mb-4">Student Activity</h2>
+          <h2 className="font-semibold text-gray-900 text-sm mb-4">Viewer Activity</h2>
           {activity.length === 0 ? (
             <p className="text-gray-400 text-sm">No recent activity.</p>
           ) : (

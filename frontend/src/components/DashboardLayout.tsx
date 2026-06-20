@@ -5,7 +5,7 @@ const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: DashboardIcon, end: true },
   { to: '/dashboard/sessions', label: 'Sessions', icon: SessionsIcon, end: false },
   { to: '/dashboard/analytics', label: 'Analytics', icon: AnalyticsIcon, end: false },
-  { to: '/dashboard/students', label: 'Students', icon: StudentsIcon, end: false },
+  { to: '/dashboard/students', label: 'Viewers', icon: StudentsIcon, end: false },
   { to: '/dashboard/settings', label: 'Settings', icon: SettingsIcon, end: false },
 ]
 
@@ -25,7 +25,7 @@ export default function DashboardLayout() {
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-3 h-3 rounded-full bg-primary inline-block" />
-            <span className="font-bold text-primary text-lg">Onteach</span>
+            <span className="font-bold text-primary text-lg">Veologue</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">

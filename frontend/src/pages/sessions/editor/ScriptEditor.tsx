@@ -22,7 +22,7 @@ import BlockCard from './BlockCard'
 import BlockSettings from './BlockSettings'
 
 const PALETTE_ITEMS: { type: BlockType; label: string; description: string; icon: React.ReactNode }[] = [
-  { type: 'spoken_text', label: 'Spoken Text', description: 'Narrate content directly to your students.', icon: <AvatarSm /> },
+  { type: 'spoken_text', label: 'Spoken Text', description: 'Narrate content directly to your viewers.', icon: <AvatarSm /> },
   { type: 'media_insert', label: 'Media Insert', description: 'Display images, charts, or brief clips.', icon: <MediaSm /> },
   { type: 'pause', label: 'Timed Pause', description: 'Insert a deliberate silence.', icon: <PauseSm /> },
   { type: 'action_button', label: 'Action Button', description: 'Add interactive prompts or links.', icon: <LinkSm /> },

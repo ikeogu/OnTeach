@@ -324,7 +324,7 @@ function OverviewTab({
             {shareUrl && (
               <p className="text-xs text-gray-400 mt-4">
                 <a href={shareUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                  Preview student view →
+                  Preview viewer experience →
                 </a>
               </p>
             )}
@@ -334,7 +334,7 @@ function OverviewTab({
           <div className="bg-primary rounded-xl p-5 text-white">
             <p className="font-semibold text-sm mb-1">Unlock AI Insights</p>
             <p className="text-xs text-white/70 leading-relaxed mb-4">
-              Generate student performance reports and topic gap analysis with our AI Analytics module.
+              Generate viewer performance reports and topic gap analysis with our AI Analytics module.
             </p>
             <button className="bg-white text-primary text-xs font-semibold px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
               Upgrade Now
@@ -347,12 +347,12 @@ function OverviewTab({
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="font-semibold text-gray-900 text-sm">Recent Activity</h3>
-              <p className="text-xs text-gray-400">Student interactions &amp; questions</p>
+              <p className="text-xs text-gray-400">Viewer interactions &amp; questions</p>
             </div>
           </div>
 
           {logs.length === 0 ? (
-            <p className="text-gray-400 text-sm">No student activity yet.</p>
+            <p className="text-gray-400 text-sm">No viewer activity yet.</p>
           ) : (
             <div className="space-y-4">
               {logs.slice(0, 6).map((log) => (
