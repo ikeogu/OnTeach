@@ -10,6 +10,7 @@ interface Props {
   block: DraftBlock
   index: number
   isSelected: boolean
+  onSelect?: () => void
 }
 
 const BLOCK_LABELS: Record<string, string> = {
@@ -26,7 +27,7 @@ const BLOCK_ICONS: Record<string, React.ReactNode> = {
   pause: <PauseIcon />,
 }
 
-export default function BlockCard({ block, index, isSelected }: Props) {
+export default function BlockCard({ block, index, isSelected, onSelect }: Props) {
   const { selectBlock, deleteBlock, addBlock } = useEditorStore()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.clientId })
 
@@ -41,7 +42,7 @@ export default function BlockCard({ block, index, isSelected }: Props) {
       ref={setNodeRef}
       style={style}
       className={`flex gap-3 group`}
-      onClick={() => selectBlock(block.clientId)}
+      onClick={() => { selectBlock(block.clientId); onSelect?.() }}
     >
       {/* Avatar icon column */}
       <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-1 ${
