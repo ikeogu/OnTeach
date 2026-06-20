@@ -46,12 +46,12 @@ export default function UploadContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-50 flex flex-col">
-      <header className="h-14 bg-white border-b border-gray-200 flex items-center px-6">
+      <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6">
         <span className="font-bold text-primary text-lg">Veologue</span>
       </header>
 
       <div className="flex-1 flex items-start justify-center px-4 py-10">
-        <div className="w-full max-w-xl bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="w-full max-w-xl bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-8">
           {/* Progress */}
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Step 2 of 4</span>
@@ -169,7 +169,7 @@ function DropZone({ upload, isUploading, accept, hint, icon, inputRef, onFileSel
 
   return (
     <div
-      className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+      className={`border-2 border-dashed rounded-xl p-5 sm:p-8 text-center cursor-pointer transition-colors ${
         isDragOver ? 'border-primary bg-primary-light' : 'border-gray-200 hover:border-gray-300'
       }`}
       onDragOver={(e) => { e.preventDefault(); setIsDragOver(true) }}

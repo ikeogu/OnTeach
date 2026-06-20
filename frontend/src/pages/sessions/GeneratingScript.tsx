@@ -57,7 +57,7 @@ export default function GeneratingScript() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="h-14 bg-white border-b border-gray-200 flex items-center px-6">
+      <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6">
         <span className="font-bold text-primary text-lg">Veologue</span>
       </header>
 
@@ -111,11 +111,11 @@ export default function GeneratingScript() {
             </div>
 
             {/* Skeleton preview cards */}
-            <div className="flex gap-4">
+            <div className="flex gap-3 w-full max-w-sm">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="w-44 h-20 bg-white rounded-xl border border-gray-200 flex items-center gap-3 px-3 animate-pulse">
-                  <div className="w-8 h-8 bg-gray-100 rounded-lg shrink-0" />
-                  <div className="flex-1 space-y-1.5">
+                <div key={i} className="flex-1 h-16 bg-white rounded-xl border border-gray-200 flex items-center gap-2 px-2 animate-pulse">
+                  <div className="w-7 h-7 bg-gray-100 rounded-lg shrink-0" />
+                  <div className="flex-1 space-y-1.5 min-w-0">
                     <div className="h-2 bg-gray-100 rounded w-3/4" />
                     <div className="h-2 bg-gray-100 rounded w-1/2" />
                   </div>

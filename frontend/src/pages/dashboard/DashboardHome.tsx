@@ -124,25 +124,34 @@ export default function DashboardHome() {
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[560px]">
-              <thead>
-                <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-100">
-                  <th className="px-5 py-3 text-left">Session</th>
-                  <th className="px-5 py-3 text-left hidden sm:table-cell">Mode</th>
-                  <th className="px-5 py-3 text-left">Status</th>
-                  <th className="px-5 py-3 text-left hidden md:table-cell">Viewers</th>
-                  <th className="px-5 py-3 text-left hidden md:table-cell">Created</th>
-                  <th className="px-5 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {sessions.slice(0, 5).map((s) => (
-                  <SessionRow key={s.id} session={s} />
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {/* Mobile card list */}
+            <div className="divide-y divide-gray-100 sm:hidden">
+              {sessions.slice(0, 5).map((s) => (
+                <SessionCard key={s.id} session={s} />
+              ))}
+            </div>
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                    <th className="px-5 py-3 text-left">Session</th>
+                    <th className="px-5 py-3 text-left">Mode</th>
+                    <th className="px-5 py-3 text-left">Status</th>
+                    <th className="px-5 py-3 text-left hidden md:table-cell">Viewers</th>
+                    <th className="px-5 py-3 text-left hidden md:table-cell">Created</th>
+                    <th className="px-5 py-3" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {sessions.slice(0, 5).map((s) => (
+                    <SessionRow key={s.id} session={s} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
@@ -158,7 +167,7 @@ export default function DashboardHome() {
           {sessions.length === 0 ? (
             <p className="text-gray-400 text-sm">Insights will appear once your sessions have viewer activity.</p>
           ) : (
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               {/* Insight cards */}
               <div className="flex-1 space-y-3">
                 <div className="border border-primary/30 bg-primary-light rounded-xl p-4">
@@ -176,24 +185,26 @@ export default function DashboardHome() {
               </div>
 
               {/* Retention ring */}
-              <div className="flex flex-col items-center justify-center w-40 shrink-0">
-                <svg viewBox="0 0 100 100" className="w-28 h-28 -rotate-90">
-                  <circle cx="50" cy="50" r="38" fill="none" stroke="#e9e9f7" strokeWidth="10" />
-                  <circle
-                    cx="50" cy="50" r="38" fill="none"
-                    stroke="#5b5bd6" strokeWidth="10"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={strokeOffset}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="-mt-20 mb-12 text-center">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {retentionPct != null ? `${retentionPct}%` : '—'}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">Retention</p>
+              <div className="flex items-center sm:flex-col sm:justify-center gap-4 sm:gap-0 sm:w-40 shrink-0">
+                <div className="relative w-24 h-24 shrink-0">
+                  <svg viewBox="0 0 100 100" className="w-24 h-24 -rotate-90">
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#e9e9f7" strokeWidth="10" />
+                    <circle
+                      cx="50" cy="50" r="38" fill="none"
+                      stroke="#5b5bd6" strokeWidth="10"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={strokeOffset}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <p className="text-xl font-bold text-gray-900">
+                      {retentionPct != null ? `${retentionPct}%` : '—'}
+                    </p>
+                    <p className="text-xs text-gray-500">Retention</p>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-400 text-center leading-tight">
+                <p className="text-xs text-gray-400 leading-tight sm:text-center sm:mt-3">
                   {retentionPct != null
                     ? 'Viewer completion rate across all sessions.'
                     : 'Complete sessions will show retention.'}
@@ -238,6 +249,35 @@ function StatCard({ label, value, suffix, icon }: { label: string; value: string
   )
 }
 
+function SessionCard({ session }: { session: Session }) {
+  const navigate = useNavigate()
+  return (
+    <div
+      className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 cursor-pointer transition-colors"
+      onClick={() => navigate(`/dashboard/sessions/${session.id}`)}
+    >
+      <div
+        className="w-10 h-10 rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden"
+        style={
+          session.cover_image_url
+            ? { backgroundImage: `url(${session.cover_image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+            : { background: 'linear-gradient(135deg, #3730a3, #5b5bd6)' }
+        }
+      >
+        {!session.cover_image_url && session.name[0]}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-gray-800 text-sm truncate">{session.name}</p>
+        <p className="text-xs text-gray-400 mt-0.5">{MODE_LABELS[session.mode]}</p>
+      </div>
+      <span className={`inline-flex items-center gap-1 text-xs font-medium shrink-0 ${session.status === 'active' ? 'text-green-600' : 'text-gray-400'}`}>
+        <span className={`w-1.5 h-1.5 rounded-full ${session.status === 'active' ? 'bg-green-500' : 'bg-gray-300'}`} />
+        {session.status === 'active' ? 'Active' : 'Draft'}
+      </span>
+    </div>
+  )
+}
+
 function SessionRow({ session }: { session: Session }) {
   const navigate = useNavigate()
 
@@ -261,7 +301,7 @@ function SessionRow({ session }: { session: Session }) {
           <span className="font-medium text-gray-800 line-clamp-1">{session.name}</span>
         </div>
       </td>
-      <td className="px-5 py-3.5 hidden sm:table-cell">
+      <td className="px-5 py-3.5">
         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${MODE_COLORS[session.mode]}`}>
           {MODE_LABELS[session.mode]}
         </span>

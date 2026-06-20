@@ -35,7 +35,7 @@ function QAPanel({
   }
 
   return (
-    <div className="absolute right-3 bottom-3 z-20 w-[300px] rounded-2xl bg-[#1a1f2e]/95 backdrop-blur-sm border border-white/10 shadow-2xl flex flex-col overflow-hidden max-h-[420px]">
+    <div className="absolute left-3 right-3 bottom-3 z-20 sm:left-auto sm:w-[300px] rounded-2xl bg-[#1a1f2e]/95 backdrop-blur-sm border border-white/10 shadow-2xl flex flex-col overflow-hidden max-h-[60vh] sm:max-h-[420px]">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 flex-shrink-0">
         <span className="text-white text-sm font-semibold">Ask a question</span>
@@ -634,17 +634,17 @@ export default function ActiveSession() {
           {/* Raise Hand */}
           <button
             onClick={handleRaiseHand}
-            className={`flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors flex-shrink-0 ${
+            className={`flex items-center gap-2 text-sm font-semibold px-3 sm:px-4 py-2.5 rounded-xl transition-colors flex-shrink-0 ${
               qaOpen
                 ? 'bg-[#5b5bd6]/20 text-[#5b5bd6] border border-[#5b5bd6]/40'
                 : 'bg-[#5b5bd6] hover:bg-[#4a4abf] text-white'
             }`}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
             </svg>
-            {qaOpen ? 'Hand Raised' : 'Raise Hand'}
+            <span className="hidden sm:inline">{qaOpen ? 'Hand Raised' : 'Raise Hand'}</span>
           </button>
         </div>
       </div>

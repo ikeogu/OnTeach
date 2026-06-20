@@ -69,7 +69,7 @@ export default function CreateSession() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-50 flex flex-col">
       {/* Top bar */}
-      <header className="h-14 bg-white border-b border-gray-200 flex items-center px-6">
+      <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6">
         <span className="font-bold text-primary text-lg">Veologue</span>
         <div className="ml-auto flex items-center gap-3">
           <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50">
@@ -81,7 +81,7 @@ export default function CreateSession() {
       </header>
 
       <div className="flex-1 flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-8">
           {/* Progress */}
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Step 1 of 4</span>
@@ -114,7 +114,7 @@ export default function CreateSession() {
             <label className="block text-sm font-medium text-gray-700 mb-3">Select session mode</label>
 
             {/* Top 2: available modes */}
-            <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               {MODE_OPTIONS.filter((m) => m.available).map((opt) => (
                 <button
                   key={opt.value}

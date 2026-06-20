@@ -101,7 +101,7 @@ export default function AvatarVoice() {
   return (
     <div className="min-h-screen bg-[#f8f8f8] flex flex-col">
       {/* Top bar */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
         <span className="font-bold text-[#5b5bd6] text-lg">Veologue</span>
         <div className="flex items-center gap-3 text-gray-400">
           <button className="w-8 h-8 flex items-center justify-center hover:text-gray-600">
@@ -122,7 +122,7 @@ export default function AvatarVoice() {
 
       {/* Card */}
       <div className="flex-1 flex items-start justify-center py-10 px-4">
-        <div className="w-full max-w-[520px] bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="w-full max-w-[520px] bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-8">
           {/* Step indicator */}
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">Step 3 of 4</span>

@@ -58,7 +58,7 @@ export default function SessionPublished() {
   return (
     <div className="min-h-screen bg-[#f8f8f8] flex flex-col">
       {/* Top bar */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
         <span className="font-bold text-[#5b5bd6] text-lg">Veologue</span>
         <div className="flex items-center gap-3 text-gray-400">
           <button className="w-8 h-8 flex items-center justify-center hover:text-gray-600">
