@@ -100,4 +100,10 @@ async def generate_script(
         payload = {"status": "failed", "error": str(e), "blocks": []}
 
     async with httpx.AsyncClient(timeout=30) as http:
-        await http.post(callback_url, json=payload)
+        try:
+            await http.post(callback_url, json=payload)
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).error(
+                "script-callback failed — url=%s error=%s", callback_url, exc
+            )

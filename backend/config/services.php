@@ -51,7 +51,7 @@ return [
         'url' => env('AI_SERVICE_URL', 'http://127.0.0.1:8001'),
         'ws_url' => env('AI_SERVICE_WS_URL', 'ws://127.0.0.1:8001'),
         'jwt_secret' => env('SESSION_JWT_SECRET'),
-        'laravel_internal_url' => env('LARAVEL_INTERNAL_URL', 'http://127.0.0.1:8000'),
+        'laravel_internal_url' => env('LARAVEL_INTERNAL_URL', env('APP_URL', 'http://127.0.0.1:8000')),
     ],
 
     'livekit' => [
