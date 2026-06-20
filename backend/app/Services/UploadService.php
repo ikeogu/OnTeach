@@ -11,9 +11,39 @@ use Illuminate\Http\UploadedFile;
 
 class UploadService
 {
-    public function store(Session $session, UploadedFile $file, string $kind): Upload
+    public function storeText(Session $session, string $text, string $kind): Upload
     {
-        $cloudinary = new Cloudinary(Configuration::instance([
+        $tmp = tempnam(sys_get_temp_dir(), 'upload_') . '.txt';
+        file_put_contents($tmp, $text);
+
+        try {
+            $cloudinary = $this->cloudinary();
+            $result = $cloudinary->uploadApi()->upload($tmp, [
+                'resource_type' => 'raw',
+                'folder'        => "sessions/{$session->id}/uploads",
+            ]);
+            $cloudUrl = $result['secure_url'];
+        } finally {
+            @unlink($tmp);
+        }
+
+        $upload = Upload::create([
+            'session_id'    => $session->id,
+            'kind'          => $kind,
+            'file_path'     => $cloudUrl,
+            'original_name' => 'pasted-content.txt',
+            'mime'          => 'text/plain',
+            'size'          => strlen($text),
+        ]);
+
+        IngestUploadsJob::dispatch($session, [$upload]);
+
+        return $upload;
+    }
+
+    private function cloudinary(): Cloudinary
+    {
+        return new Cloudinary(Configuration::instance([
             'cloud' => [
                 'cloud_name' => config('services.cloudinary.cloud_name'),
                 'api_key'    => config('services.cloudinary.api_key'),
@@ -21,6 +51,11 @@ class UploadService
             ],
             'url' => ['secure' => true],
         ]));
+    }
+
+    public function store(Session $session, UploadedFile $file, string $kind): Upload
+    {
+        $cloudinary = $this->cloudinary();
 
         $result = $cloudinary->uploadApi()->upload($file->getRealPath(), [
             'resource_type' => 'raw',

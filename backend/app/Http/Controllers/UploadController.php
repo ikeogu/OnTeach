@@ -27,6 +27,20 @@ class UploadController extends Controller
         return response()->json($upload, 201);
     }
 
+    public function storeText(Request $request, Session $session): JsonResponse
+    {
+        $this->authorize('update', $session);
+
+        $data = $request->validate([
+            'kind' => ['required', 'in:content,knowledge'],
+            'text' => ['required', 'string', 'max:200000'],
+        ]);
+
+        $upload = $this->uploadService->storeText($session, $data['text'], $data['kind']);
+
+        return response()->json($upload, 201);
+    }
+
     public function storeUrl(Request $request, Session $session): JsonResponse
     {
         $this->authorize('update', $session);
