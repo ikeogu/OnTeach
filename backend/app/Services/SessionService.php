@@ -12,7 +12,7 @@ class SessionService
 {
     public function listForUser(User $user): Collection
     {
-        return $user->sessions()->latest()->get();
+        return $user->sessions()->withCount('instances as total_joins')->latest()->get();
     }
 
     public function create(User $user, string $name, string $mode): Session

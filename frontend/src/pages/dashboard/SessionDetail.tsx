@@ -217,15 +217,7 @@ export default function SessionDetail() {
         </div>
       )}
       {tab === 'analytics' && (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v18h18M7 16l4-6 4 4 4-8" />
-            </svg>
-          </div>
-          <p className="text-gray-700 font-semibold mb-1">Advanced Analytics</p>
-          <p className="text-gray-400 text-sm">Detailed analytics coming in a future release.</p>
-        </div>
+        <AnalyticsTab sessionStats={sessionStats} logs={logs} blocks={blocks} />
       )}
       {tab === 'settings' && (
         <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-lg">
@@ -246,6 +238,124 @@ export default function SessionDetail() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function AnalyticsTab({
+  sessionStats,
+  logs,
+  blocks,
+}: {
+  sessionStats: SessionStats | undefined
+  logs: QALog[]
+  blocks: import('../../api/sessions').ScriptBlock[]
+}) {
+  // Group questions by block_context_id for heatmap
+  const questionsByBlock = logs.reduce<Record<number, number>>((acc, log) => {
+    if (log.block_context_id != null) {
+      acc[log.block_context_id] = (acc[log.block_context_id] ?? 0) + 1
+    }
+    return acc
+  }, {})
+
+  // Build heatmap data: only blocks that had questions, plus neighbours for context
+  const blockIdsWithQuestions = new Set(Object.keys(questionsByBlock).map(Number))
+  const heatmapBlocks = blocks.filter((b) => blockIdsWithQuestions.has(b.id))
+  const maxQ = Math.max(...Object.values(questionsByBlock), 1)
+
+  // Most asked block label for stat card
+  const mostAskedLabel = sessionStats?.most_asked_block_label
+  const mostAskedOrder = sessionStats?.most_asked_block_order
+
+  return (
+    <div>
+      {/* Stat row */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <AnalyticCard
+          label="TOTAL VIEWS"
+          value={sessionStats ? sessionStats.total_joins.toLocaleString() : '—'}
+        />
+        <AnalyticCard
+          label="UNIQUE VIEWERS"
+          value={sessionStats ? sessionStats.unique_students.toLocaleString() : '—'}
+        />
+        <AnalyticCard
+          label="AVG. COMPLETION"
+          value={sessionStats ? `${sessionStats.avg_completion_pct}%` : '—'}
+        />
+        <AnalyticCard
+          label="QUESTIONS ASKED"
+          value={sessionStats ? sessionStats.questions_asked.toLocaleString() : '—'}
+          sub={mostAskedLabel ? `Most asked at ${mostAskedLabel}` : mostAskedOrder != null ? `Most asked at Block ${mostAskedOrder}` : undefined}
+        />
+      </div>
+
+      <div className="grid grid-cols-5 gap-5">
+        {/* Raise Hand Heatmap */}
+        <div className="col-span-3 bg-white rounded-xl border border-gray-200 p-5">
+          <h3 className="font-semibold text-gray-900 text-sm mb-1">Raise Hand Heatmap</h3>
+          <p className="text-xs text-gray-400 mb-6">Where viewers ask the most questions in your script.</p>
+
+          {heatmapBlocks.length === 0 ? (
+            <p className="text-gray-400 text-sm py-8 text-center">No questions asked yet.</p>
+          ) : (
+            <div className="flex items-end gap-2 h-32">
+              {heatmapBlocks.map((block) => {
+                const count = questionsByBlock[block.id] ?? 0
+                const heightPct = Math.max(8, Math.round((count / maxQ) * 100))
+                const isMax = count === maxQ
+                return (
+                  <div key={block.id} className="flex flex-col items-center gap-1 flex-1 min-w-0">
+                    <span className="text-xs font-bold text-primary">{count > 1 ? count : ''}</span>
+                    <div
+                      className={`w-full rounded-t-lg transition-all ${isMax ? 'bg-primary' : 'bg-primary/25'}`}
+                      style={{ height: `${heightPct}%` }}
+                      title={`Block ${block.order}: ${count} question${count !== 1 ? 's' : ''}`}
+                    />
+                    <span className={`text-xs truncate w-full text-center ${isMax ? 'text-primary font-semibold' : 'text-gray-400'}`}>
+                      {block.bookmark_label ?? `Block ${block.order}`}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Most Common Questions */}
+        <div className="col-span-2 bg-white rounded-xl border border-gray-200 p-5">
+          <h3 className="font-semibold text-gray-900 text-sm mb-4">Questions Asked</h3>
+          {logs.length === 0 ? (
+            <p className="text-gray-400 text-sm">No questions yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {logs.slice(0, 6).map((log) => (
+                <div key={log.id} className="bg-gray-50 rounded-lg px-3 py-2.5">
+                  <p className="text-xs text-gray-800 font-medium leading-snug line-clamp-2">
+                    "{log.question}"
+                  </p>
+                  {log.block_label && (
+                    <span className="inline-block mt-1 text-xs text-primary font-medium bg-primary/10 rounded px-1.5 py-0.5">
+                      {log.block_label}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AnalyticCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 px-4 py-4">
+      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{label}</p>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
     </div>
   )
 }

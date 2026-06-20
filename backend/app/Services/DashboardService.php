@@ -49,20 +49,36 @@ class DashboardService
 
     public function sessionStats(Session $session): array
     {
-        $joins       = $session->instances()->count();
-        $completions = $session->instances()->whereNotNull('completed_at')->count();
-        $questions   = QaLog::whereHas(
+        $joins          = $session->instances()->count();
+        $completions    = $session->instances()->whereNotNull('completed_at')->count();
+        $uniqueStudents = $session->instances()->distinct('student_name')->count('student_name');
+
+        $questions = QaLog::whereHas(
             'sessionInstance',
             fn ($q) => $q->where('session_id', $session->id)
         )->count();
 
+        $mostAsked = QaLog::whereHas(
+            'sessionInstance',
+            fn ($q) => $q->where('session_id', $session->id)
+        )
+            ->whereNotNull('block_context_id')
+            ->selectRaw('block_context_id, count(*) as cnt')
+            ->groupBy('block_context_id')
+            ->orderByDesc('cnt')
+            ->with('blockContext:id,bookmark_label,order')
+            ->first();
+
         $avgCompletion = $joins > 0 ? (int) round(($completions / $joins) * 100) : 0;
 
         return [
-            'total_joins'        => $joins,
-            'total_completions'  => $completions,
-            'questions_asked'    => $questions,
-            'avg_completion_pct' => $avgCompletion,
+            'total_joins'             => $joins,
+            'unique_students'         => $uniqueStudents,
+            'total_completions'       => $completions,
+            'questions_asked'         => $questions,
+            'avg_completion_pct'      => $avgCompletion,
+            'most_asked_block_label'  => $mostAsked?->blockContext?->bookmark_label,
+            'most_asked_block_order'  => $mostAsked?->blockContext?->order,
         ];
     }
 

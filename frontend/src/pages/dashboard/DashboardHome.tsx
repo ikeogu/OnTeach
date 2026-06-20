@@ -126,7 +126,7 @@ export default function DashboardHome() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+              <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-100">
                 <th className="px-5 py-3 text-left">Session</th>
                 <th className="px-5 py-3 text-left">Mode</th>
                 <th className="px-5 py-3 text-left">Status</th>
@@ -247,10 +247,14 @@ function SessionRow({ session }: { session: Session }) {
       <td className="px-5 py-3.5">
         <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
-            style={{ background: 'linear-gradient(135deg, #3730a3, #5b5bd6)' }}
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden"
+            style={
+              session.cover_image_url
+                ? { backgroundImage: `url(${session.cover_image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                : { background: 'linear-gradient(135deg, #3730a3, #5b5bd6)' }
+            }
           >
-            {session.name[0]}
+            {!session.cover_image_url && session.name[0]}
           </div>
           <span className="font-medium text-gray-800 line-clamp-1">{session.name}</span>
         </div>
@@ -266,7 +270,9 @@ function SessionRow({ session }: { session: Session }) {
           {session.status === 'active' ? 'Active' : 'Draft'}
         </span>
       </td>
-      <td className="px-5 py-3.5 text-gray-500 text-sm">—</td>
+      <td className="px-5 py-3.5 text-gray-600 text-sm font-medium">
+        {session.total_joins != null ? session.total_joins.toLocaleString() : '—'}
+      </td>
       <td className="px-5 py-3.5 text-gray-500 text-sm">{timeAgo(session.created_at)}</td>
       <td className="px-5 py-3.5">
         <button className="text-gray-400 hover:text-gray-600 p-1" onClick={(e) => e.stopPropagation()}>

@@ -40,13 +40,14 @@ class DashboardController extends Controller
         $logs = $this->service->sessionLogs($session);
 
         return response()->json($logs->map(fn ($l) => [
-            'id'           => $l->id,
-            'student_name' => $l->sessionInstance->student_name,
-            'question'     => $l->question,
-            'answer'       => $l->answer,
-            'block_label'  => $l->blockContext?->bookmark_label,
-            'input_mode'   => $l->input_mode,
-            'created_at'   => $l->created_at?->toIso8601String(),
+            'id'               => $l->id,
+            'student_name'     => $l->sessionInstance->student_name,
+            'question'         => $l->question,
+            'answer'           => $l->answer,
+            'block_context_id' => $l->block_context_id,
+            'block_label'      => $l->blockContext?->bookmark_label,
+            'input_mode'       => $l->input_mode,
+            'created_at'       => $l->created_at?->toIso8601String(),
         ]));
     }
 }

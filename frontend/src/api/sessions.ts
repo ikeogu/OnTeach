@@ -14,6 +14,7 @@ export interface Session {
   published_at: string | null
   created_at: string
   updated_at: string
+  total_joins?: number
 }
 
 export type BlockType = 'spoken_text' | 'media_insert' | 'action_button' | 'pause'
@@ -80,9 +81,12 @@ export interface ActivityItem {
 
 export interface SessionStats {
   total_joins: number
+  unique_students: number
   total_completions: number
   questions_asked: number
   avg_completion_pct: number
+  most_asked_block_label: string | null
+  most_asked_block_order: number | null
 }
 
 export interface StudentRecord {
@@ -99,6 +103,7 @@ export interface QALog {
   student_name: string
   question: string
   answer: string
+  block_context_id: number | null
   block_label: string | null
   input_mode: 'text' | 'voice'
   created_at: string
