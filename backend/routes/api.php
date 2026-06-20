@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Uploads
     Route::post('/sessions/{session}/uploads', [UploadController::class, 'store']);
+    Route::post('/sessions/{session}/upload-url', [UploadController::class, 'storeUrl']);
 
     // Script generation
     Route::post('/sessions/{session}/generate', [ScriptGenerationController::class, 'generate']);

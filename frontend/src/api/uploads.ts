@@ -9,6 +9,9 @@ export const uploadsApi = {
     return api.post<Upload>(`/sessions/${sessionId}/uploads`, form).then((r) => r.data)
   },
 
+  uploadUrl: (sessionId: number, url: string, kind: 'content' | 'knowledge') =>
+    api.post<Upload>(`/sessions/${sessionId}/upload-url`, { url, kind }).then((r) => r.data),
+
   generate: (sessionId: number) =>
     api.post<{ status: string }>(`/sessions/${sessionId}/generate`).then((r) => r.data),
 
