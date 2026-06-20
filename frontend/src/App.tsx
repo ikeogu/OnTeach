@@ -21,6 +21,9 @@ import SessionLoading from './pages/student/SessionLoading'
 import ActiveSession from './pages/student/ActiveSession'
 import EmbedPlayer from './pages/student/EmbedPlayer'
 import StudentsPage from './pages/dashboard/StudentsPage'
+import HomePage from './pages/marketing/HomePage'
+import FeaturesPage from './pages/marketing/FeaturesPage'
+import PricingPage from './pages/marketing/PricingPage'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
@@ -74,8 +77,10 @@ export default function App() {
           {/* Embed player — iframe, no auth */}
           <Route path="/embed/:embedSlug" element={<EmbedPlayer />} />
 
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
