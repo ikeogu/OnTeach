@@ -53,7 +53,7 @@ export default function CreateSession() {
   const mutation = useMutation({
     mutationFn: sessionsApi.create,
     onSuccess: (session) => {
-      navigate(`/dashboard/sessions/${session.id}/edit`)
+      navigate(`/dashboard/sessions/${session.id}/upload`)
     },
   })
 
