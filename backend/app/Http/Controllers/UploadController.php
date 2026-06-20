@@ -13,54 +13,49 @@ class UploadController extends Controller
 {
     public function __construct(private UploadService $uploadService) {}
 
+    /**
+     * Single endpoint — accepts file, text, or url; routes internally.
+     */
     public function store(Request $request, Session $session): JsonResponse
     {
         $this->authorize('update', $session);
 
-        $data = $request->validate([
+        $request->validate([
             'kind' => ['required', 'in:content,knowledge'],
-            'file' => ['required', 'file', 'max:102400', 'mimes:pdf,pptx,ppt,docx,doc,txt'],
         ]);
 
-        $upload = $this->uploadService->store($session, $data['file'], $data['kind']);
+        $kind = $request->input('kind');
 
-        return response()->json($upload, 201);
-    }
+        if ($request->hasFile('file')) {
+            $request->validate([
+                'file' => ['file', 'max:102400', 'mimes:pdf,pptx,ppt,docx,doc,txt'],
+            ]);
+            $upload = $this->uploadService->store($session, $request->file('file'), $kind);
+            return response()->json($upload, 201);
+        }
 
-    public function storeText(Request $request, Session $session): JsonResponse
-    {
-        $this->authorize('update', $session);
+        if ($request->filled('url')) {
+            $request->validate(['url' => ['url', 'max:2048']]);
+            $upload = Upload::create([
+                'session_id'    => $session->id,
+                'kind'          => $kind,
+                'file_path'     => $request->input('url'),
+                'original_name' => $request->input('url'),
+                'mime'          => 'text/html',
+                'size'          => 0,
+            ]);
+            IngestUploadsJob::dispatch($session, [$upload]);
+            return response()->json($upload, 201);
+        }
 
-        $data = $request->validate([
-            'kind' => ['required', 'in:content,knowledge'],
-            'text' => ['required', 'string', 'max:200000'],
-        ]);
+        if ($request->filled('text')) {
+            $request->validate(['text' => ['string', 'max:200000']]);
+            $upload = $this->uploadService->storeText($session, $request->input('text'), $kind);
+            return response()->json($upload, 201);
+        }
 
-        $upload = $this->uploadService->storeText($session, $data['text'], $data['kind']);
-
-        return response()->json($upload, 201);
-    }
-
-    public function storeUrl(Request $request, Session $session): JsonResponse
-    {
-        $this->authorize('update', $session);
-
-        $data = $request->validate([
-            'kind' => ['required', 'in:content,knowledge'],
-            'url'  => ['required', 'url', 'max:2048'],
-        ]);
-
-        $upload = Upload::create([
-            'session_id'    => $session->id,
-            'kind'          => $data['kind'],
-            'file_path'     => $data['url'],
-            'original_name' => $data['url'],
-            'mime'          => 'text/html',
-            'size'          => 0,
-        ]);
-
-        IngestUploadsJob::dispatch($session, [$upload]);
-
-        return response()->json($upload, 201);
+        return response()->json([
+            'message' => 'Provide a file, url, or text field.',
+        ], 422);
     }
 }
