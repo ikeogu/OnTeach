@@ -298,7 +298,7 @@ async def entrypoint(ctx: JobContext) -> None:
                         await send({"type": "qa_answer_chunk", "text": token})
                         answer_parts.append(token)
                 except Exception as exc:
-                    log.error("RAG query failed: %s", exc)
+                    log.error("RAG query failed: %s", exc, exc_info=True)
                     fallback = "I'm sorry, I couldn't retrieve an answer right now. Let's continue the session."
                     await send({"type": "qa_answer_chunk", "text": fallback})
                     answer_parts = [fallback]
