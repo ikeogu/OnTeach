@@ -44,6 +44,15 @@ async def _fetch_player_data(session_id: int) -> dict:
         return resp.json()
 
 
+async def _mark_complete(session_id: int, instance_id: str) -> None:
+    try:
+        url = f"{settings.laravel_internal_url}/api/internal/sessions/{session_id}/complete"
+        async with httpx.AsyncClient(timeout=10) as http:
+            await http.post(url, json={"session_instance_id": instance_id})
+    except Exception:
+        pass
+
+
 async def _log_qa(session_id: int, instance_id: str, question: str, answer: str, block_id: int | None) -> None:
     try:
         url = f"{settings.laravel_internal_url}/api/internal/sessions/{session_id}/qa-log"
@@ -324,6 +333,7 @@ async def entrypoint(ctx: JobContext) -> None:
 
         i += 1
 
+    asyncio.create_task(_mark_complete(session_id, instance_id))
     await send({"type": "session_complete"})
     dispatch_task.cancel()
 

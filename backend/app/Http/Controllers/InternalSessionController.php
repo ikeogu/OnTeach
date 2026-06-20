@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\QaLog;
 use App\Models\Session;
+use App\Models\SessionInstance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -34,6 +35,20 @@ class InternalSessionController extends Controller
                 'bookmark_label' => $b->bookmark_label,
             ])->values(),
         ]);
+    }
+
+    /** Called by the LiveKit agent when all blocks have been played. */
+    public function complete(Request $request, Session $session): JsonResponse
+    {
+        $data = $request->validate([
+            'session_instance_id' => ['required', 'string'],
+        ]);
+
+        SessionInstance::where('id', $data['session_instance_id'])
+            ->whereNull('completed_at')
+            ->update(['completed_at' => now()]);
+
+        return response()->json(['ok' => true]);
     }
 
     /** Called by FastAPI after each RAG Q&A to persist the qa_log record. */

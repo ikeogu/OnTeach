@@ -59,6 +59,7 @@ Route::post('/internal/sessions/{session}/script-callback', [ScriptGenerationCon
 Route::post('/internal/sessions/{session}/ingest-callback', [ScriptGenerationController::class, 'ingestCallback']);
 Route::get('/internal/sessions/{session}/player-data', [InternalSessionController::class, 'playerData']);
 Route::post('/internal/sessions/{session}/qa-log', [InternalSessionController::class, 'logQA']);
+Route::post('/internal/sessions/{session}/complete', [InternalSessionController::class, 'complete']);
 
 // Public — student entry (no auth)
 Route::prefix('public/s')->group(function () {
