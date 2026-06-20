@@ -4,7 +4,7 @@ import uuid
 from typing import AsyncIterator
 
 import anthropic
-from openai import AsyncOpenAI
+from fastembed import TextEmbedding
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import (
     Distance,
@@ -20,9 +20,19 @@ from .chunker import chunk_text
 from .text_extractor import extract_text
 
 COLLECTION = "onteach_chunks"
-VECTOR_SIZE = 1536  # OpenAI text-embedding-3-small
-EMBED_MODEL = "text-embedding-3-small"
+VECTOR_SIZE = 384  # BAAI/bge-small-en-v1.5
+EMBED_MODEL_NAME = "BAAI/bge-small-en-v1.5"
 TOP_K = 5
+
+# Module-level model — loaded once, shared across all requests
+_embed_model: TextEmbedding | None = None
+
+
+def _get_embed_model() -> TextEmbedding:
+    global _embed_model
+    if _embed_model is None:
+        _embed_model = TextEmbedding(EMBED_MODEL_NAME)
+    return _embed_model
 
 RAG_SYSTEM = """\
 You are a knowledgeable, friendly tutor answering a student question mid-session.
@@ -37,7 +47,6 @@ class RAGService:
 
     def __init__(self) -> None:
         self._qdrant: AsyncQdrantClient | None = None
-        self._openai: AsyncOpenAI | None = None
         self._anthropic: anthropic.AsyncAnthropic | None = None
 
     # ── lazy clients ──────────────────────────────────────────────────────
@@ -46,11 +55,6 @@ class RAGService:
         if self._qdrant is None:
             self._qdrant = AsyncQdrantClient(url=settings.qdrant_url)
         return self._qdrant
-
-    def _get_openai(self) -> AsyncOpenAI:
-        if self._openai is None:
-            self._openai = AsyncOpenAI(api_key=settings.openai_api_key)
-        return self._openai
 
     def _get_anthropic(self) -> anthropic.AsyncAnthropic:
         if self._anthropic is None:
@@ -71,9 +75,10 @@ class RAGService:
     # ── embedding ─────────────────────────────────────────────────────────
 
     async def _embed(self, texts: list[str]) -> list[list[float]]:
-        openai = self._get_openai()
-        response = await openai.embeddings.create(model=EMBED_MODEL, input=texts)
-        return [item.embedding for item in response.data]
+        loop = asyncio.get_running_loop()
+        model = _get_embed_model()
+        embeddings = await loop.run_in_executor(None, lambda: list(model.embed(texts)))
+        return [e.tolist() for e in embeddings]
 
     # ── ingest ────────────────────────────────────────────────────────────
 
