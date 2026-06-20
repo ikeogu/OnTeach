@@ -6,9 +6,7 @@ export const uploadsApi = {
     const form = new FormData()
     form.append('file', file)
     form.append('kind', kind)
-    return api.post<Upload>(`/sessions/${sessionId}/uploads`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }).then((r) => r.data)
+    return api.post<Upload>(`/sessions/${sessionId}/uploads`, form).then((r) => r.data)
   },
 
   generate: (sessionId: number) =>
